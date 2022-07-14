@@ -1,0 +1,1472 @@
+---
+title: "Covid-19 Analysis: Assessment of Covid-19 Policies Effectiveness"
+author: "Kay Royo (920227691)"
+date: "3/13/22"
+output: 
+  rmdformats::readthedown:
+    highlight: kate
+---
+
+<style> #content{max-width:1800px;}</style>
+<style> p{max-width:800px;}</style>
+<style> li{max-width:800px;}</style
+
+***
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+##Clear Compute Memory
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+rm(list=ls())
+```
+
+# **Abstract** 
+
+<span style='color:black'> 
+
+  
+</span>
+
+***
+
+# **Abstract** 
+
+<span style='color:black'> 
+
+The primary objective of this analysis is to identify whether public health policies have a significant and varying impact on the number of positive Covid-19 cases using data obtained from various sources. Analysis of variance (ANOVA) is used to assess the relationship between Covid-19 and a comprehensive set of factors to determine the effect of public health policies on the number of positive Covid-19 cases while taking into account the effects of different regions. For this method, the number of global Covid-19 cases is used as the response variable while categorical region and policy factors are used as predictor variables. Based on the results obtained, all five public health policies (face covering, vaccination, internal movement, stay-at-home, and international travel regulations) are significantly useful in determining the trajectory of Covid-19 transmission globally. Additionally, the interactions between these factors are equally effective. The identified association between the number of positive Covid-19 cases and the significant factors observed in this analysis may be an indirect association due to the fact that successful transmission of the Covid-19 virus may depend on other entities excluded from this analysis that may be used to define the significant relationships observed. 
+
+</span>
+
+***
+
+# **Introduction**
+
+<span style='color:black'> 
+
+Despite the technological innovations in our civilization today, a significant portion of the entire world’s population suffered from the unexpectedly devastating effects of the Covid-19 virus. Various government interventions and public health regulations were implemented in order to suppress the ongoing and rapid spread of Covid-19 virus and to decrease the mortality rate associated with it. As the spread of Covid-19 virus gradually declines around the world and sufficient amount of data have been collected, it is important to improve our understanding of the effectiveness of the public health policies enforced that may have significant influence on the transmission of Covid-19 virus. Experts often consider the interplay of various public health regulations to slow down the spread of a virus. However, identifying the specific policies that are correlated with virus transmission is often a challenging and complex task to perform. Often times results vary between different research studies. The results obtained from this analysis may slightly contribute to the determination of important measures that need to be implemented during a pandemic. The primary goal of this analysis is to investigate the association between the number of detected Covid-19 cases and a diverse set of public health policies.  The observations obtained from this analysis can be used for hypothesis generation and further investigations in the future since this project only focuses on the limited numbers of factors and doesn’t include other covariates that might be correlated with the features identified as statistically significant. The data sets used for this analysis were collected from two sources, _World Health Organization_ (WHO) and _Our World in Data_ (OWID).  These data sets contain the features country, region, new Covid-19 cases, date, new cases, cumulative cases, and public health policies including vaccination, face covering, internal movement, international travel, and stay-at-home order. Possible correlations between these factors are expected and appropriate methods are used to verify them. Based on the previous studies done on this subject, it can be hypothesized that a positive correlation between Covid-19 transmission and the public health policies exists. This analysis project is primarily focused on answering the following questions.
+
+
+Primary Question of Interest: 
+
+- Are public health policies useful in determining the number of positive Covid-19 cases?
+
+Secondary Questions of Interest: 
+
+- How effective are public health policies?
+  
+- Which of these public health policies are most and least effective?
+
+</span>
+
+***
+
+# **Background**
+
+<span style='color:black'> 
+
+Since Covid-19 virus can be transmitted from one individual to another regardless of gender or health and most public health policies are focused on limiting social contact, it is important to identify whether the policies implemented by public health experts are effective or not. According to a study conducted by BMC Public Health, public health measures are found to be effective in decreasing Covid-19 transmission (Ayouni et al., 2021). One of the public health policy included in this investigation is face covering. It has been proven that face masks are effective in filtering out microscopic particles. However, specific studies that focus on the effectiveness of wearing a face mask in decreasing the transmission of Covid-19 has not been extensively explored. One research study recently revealed that the use of facial coverings indoor has a positive effect on the decreasing the number of individuals testing positive for Covid-19 (Andrejko et al., 2022). Some of the public health regulations are mainly focused on reducing social contact. These regulations include stay-at-home orders, reduction of internal mobility, and international travel restrictions. Studies have shown that minimizing social contact by issuing stay-at-home orders is associated with decline in successful Covid-19 transmission (Fowler et al., 2021). Similarly, travel restrictions have been proven to mitigate the rapid spread of Covid-19 virus (Kwok et al., 2021). If stay-at-home orders are placed and international or domestic travel is restricted, then internal movement is also expected to decline. Therefore, the internal movement restriction should have similar effect on the spread of Covid-19 virus. 
+
+This project explores the data collected from two sources in order to answer the questions of interest, which are the primary focus of this analysis. Since any individual can be affected by the Covid-19 virus, this project targets the general population worldwide who are susceptible to contracting the Covid-19 virus regardless of existing health conditions. The total number of individuals all over the world in various countries that tested positive for Covid-19 from January 2020 to January 2022 is used as the response variable in the data modeling section. The data set that includes valuable information about the daily recorded new Covid-19 cases from 237 countries around the world is gathered from World Health Organization (WHO). The categorical covariates chosen are a diverse set of public health policies. The data containing public health policies are collected from Our World in Data (OWID).  Specific information about the sources are provided in the Acknowledgement section at the end of this report. The final cleaned and aggregated data set that excludes missing records are displayed in the `Data` section below.
+
+</span>
+
+***
+
+
+# **Data**
+
+<span style='color:black'> 
+The data used for this analysis was collected from various sources mentioned in the `Acknowledgement` section of this report.The supplementary data sets were collected from OWID, which contain the features that are useful for answering the primary and secondary questions of interest. The final aggregated data displayed in Table 3 below specifically used for this analysis project are aggregated by month for a total of 180 countries from 2020 to 2022. This data set contains variables that are  defined in the tables attached below (Tables 1 and 2). The maximum policy level for each month is retained and used for this analysis since policy levels do not change daily. Simplifying the data by aggregating it into a monthly record also contributes to the efficiency when analyzing this data to answer the questions of interest. A lagged variable for total number of Covid-19 cases per month is also generated in order to consider the fact that changes in policies implemented during a specific time may not yield any significant results immediately. 
+</span>
+
+```{r, include=F, message=FALSE, warning=FALSE}
+```
+
+Table 1: Variable Definitions
+```{r table2, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+tabl <- "
+
+| Variable                     | Definition                                                                                 | Levels (Values)            |
+|:----------------------------:|--------------------------------------------------------------------------------------------|----------------------------|
+| Country                      | Includes 180 countries worldwide with record                                               |                            |
+| New_cases                    | Total number of new positive Covid-19 cases from   1/3/20 through  2/16/22                 |                            |
+| Face_cover                   | Policies on the use of face coverings outside-of-the-home                                  | 5 (0,1,2,3, and 4)         |  
+| Vaccination                  | Policies on vaccination availability for different groups                                  | 6 (0,1,2,3,4, and 5)       |
+| Internal_movement            | policies on restrictions on internal movement/travel between regions and cities            | 3 (0,1, and 2)             |
+| Stay_home                    | Policies on stay-at-home requirements or household lockdowns                               | 4 (0,1,2, and 3)           |
+| International_travel         | Policies on restrictions on international travel controls                                  | 5 (0,1,2,3, and 4)         |
+"
+cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
+```
+
+
+Table 2: Level Definitions
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE,}
+table2 <- data.frame(Levels = c(0,1,2,3,4,5), Face_cover = c('No policy',
+'Recommended',
+'Required in some specified shared/public spaces outside the home with other people present, or some situations when social distancing not possible',
+'Required in all shared or public spaces outside the home with other people present or all situations when social distancing not possible',
+'Required outside the home at all times regardless of location or presence of other people', '--'), Vaccination = c('No availability',
+'Availability key workers or clinically vulnerable groups or elderly groups',
+'Availability for two of the following: key workers, clinically vulnerable groups, or elderly groups',
+'Availability for key workers, clinically vulnerable groups, and elderly groups',
+'Availability for all three plus partial additional availability (select broad groups/ages)',
+'Universal availability'), Internal_movement= c('No measures', 'Recommended movement restriction', 'Restrict movement', '--', '--', '--'), Stay_home = c('No measures',
+'Recommended not to leave the house',
+'Required to not leave the house with exceptions for daily exercise, grocery shopping, and ‘essential’ trips',
+'Required to not leave the house with minimal exceptions (e.g. allowed to leave only once every few days, or only one person can leave at a time, etc.', '--', '--'), International_travel = c('No measures', 'Screening', 'Quarantine from high-risk regions', 'Ban on high-risk regions', 'Total border closure', '--'))
+library(kableExtra)
+table2%>%kable()
+```
+
+
+```{r, include=F, message=FALSE, warning=FALSE}
+#load WHO data
+who_data <-read.csv("C:/Users/kayan/R-Projects/STA141A/141Final-Project/Data/covid/WHO-COVID-19-global-data.csv")
+who_data <- as.data.frame(who_data)
+colnames(who_data)[1] <- "Date" 
+who_data <- subset(who_data, select = -c(Country_code,New_deaths, Cumulative_deaths))
+who_data$Date  <- as.Date(who_data$Date, format = "%m/%d/%Y")
+# who_data$Date  <- as.Date(who_data$Date , format = "%y/%m/%d")
+# who_data$Date  <- as.character(who_data$Date)
+who_data$Year <- strftime(who_data$Date, "%Y")    # Create year column
+who_data$Month <- strftime(who_data$Date, "%m") 
+library(zoo)
+who_data$MonthYear <- as.yearmon(paste(who_data$Year, who_data$Month), "%Y %m")
+who_data <- subset(who_data[, c(1,8,6,7,2,3,4,5)])
+# sapply(who_data, class)
+# who_data$Country <- tolower(who_data$Country)
+```
+
+```{r, include=F,results='asis', message=FALSE, warning=FALSE}
+#load face covering data
+face_data <-read.csv("C:/Users/kayan/R-Projects/STA141A/141Final-Project/Data/policies/face-covering-policies-covid.csv", header=T)
+face_data <- as.data.frame(face_data)
+colnames(face_data)[1] <- "Country"
+colnames(face_data)[3] <- "Date"
+colnames(face_data)[4] <- "Face_cover"
+face_data$Date  <- as.Date(face_data$Date)
+# face_data$face_cover  <- as.factor(face_data$face_cover)
+sapply(face_data, class)
+```
+
+```{r, include=F,results='asis', message=FALSE, warning=FALSE}
+#load vaccination policy data
+vacc_data <-read.csv("C:/Users/kayan/R-Projects/STA141A/141Final-Project/Data/policies/covid-vaccination-policy.csv", header=T)
+vacc_data <- as.data.frame(vacc_data)
+colnames(vacc_data)[1] <- "Country"
+colnames(vacc_data)[3] <- "Date"
+colnames(vacc_data)[4] <- "Vaccination"
+vacc_data$Date  <- as.Date(vacc_data$Date)
+# vacc_data$vaccination_policy  <- as.factor(vacc_data$vaccination_policy)
+sapply(vacc_data, class)
+```
+
+```{r, include=FALSE,results='asis', message=FALSE, warning=FALSE}
+#load internal movement policy data
+internal_data <-read.csv("C:/Users/kayan/R-Projects/STA141A/141Final-Project/Data/policies/internal-movement-covid.csv", header=T)
+internal_data <- as.data.frame(internal_data)
+colnames(internal_data)[1] <- "Country"
+colnames(internal_data)[3] <- "Date"
+colnames(internal_data)[4] <- "Internal_movement"
+internal_data$Date  <- as.Date(internal_data$Date)
+# internal_data$restrictions_internal_movements  <- as.factor(internal_data$restrictions_internal_movements)
+sapply(internal_data, class)
+```
+
+```{r, include=FALSE,results='asis', message=FALSE, warning=FALSE}
+#load stay at home restrictions data
+stayhome_data <-read.csv("C:/Users/kayan/R-Projects/STA141A/141Final-Project/Data/policies/stay-at-home-covid.csv", header=T)
+stayhome_data <- as.data.frame(stayhome_data)
+colnames(stayhome_data)[1] <- "Country"
+colnames(stayhome_data)[3] <- "Date"
+colnames(stayhome_data)[4] <- "Stay_home"
+stayhome_data$Date  <- as.Date(stayhome_data$Date)
+# stayhome_data$stay_home_requirements  <- as.factor(stayhome_data$stay_home_requirements)
+sapply(stayhome_data, class)
+```
+
+```{r, include=FALSE,results='asis', message=FALSE, warning=FALSE}
+#load international travel restrictions data
+inttravel_data <-read.csv("C:/Users/kayan/R-Projects/STA141A/141Final-Project/Data/policies/international-travel-covid.csv", header=T)
+inttravel_data <- as.data.frame(inttravel_data)
+colnames(inttravel_data)[1] <- "Country"
+colnames(inttravel_data)[3] <- "Date"
+colnames(inttravel_data)[4] <- "International_travel"
+inttravel_data$Date  <- as.Date(inttravel_data$Date)
+# inttravel_data$international_travel_controls  <- as.factor(inttravel_data$international_travel_controls)
+sapply(inttravel_data, class)
+```
+
+
+<!-- ## Data Cleaning and Aggregation -->
+
+
+```{r, include=F, message=FALSE, warning=FALSE}
+#inner join three policy data
+library(dplyr)
+policy1 <- inner_join(face_data, vacc_data, by = c("Country", "Code", "Date"))
+policy1 <- inner_join(policy1, internal_data, by = c("Country", "Code", "Date"))
+policy1 <- inner_join(policy1, stayhome_data, by = c("Country", "Code", "Date"))
+policy_data <- inner_join(policy1, inttravel_data, by = c("Country", "Code", "Date"))
+```
+
+```{r include=F, message=FALSE, warning=FALSE}
+#inner join policy data and who data
+library(dplyr)
+
+df <- who_data %>% anti_join(policy_data,by = 'Country')
+df <-filter(df, Date == "2022-02-01")
+
+
+policy_data$Country[policy_data$Country=="Cape Verde"]<-"Cabo Verde"
+policy_data$Country[policy_data$Country=="Faeroe Islands"]<-"Faroe Islands"
+policy_data$Country[policy_data$Country=="Timor"]<-"Timor-Leste"
+
+who_data$Country[who_data$Country=="Bolivia (Plurinational State of)"]<-"Bolivia"
+who_data$Country[who_data$Country=="Brunei Darussalam"]<-"Brunei"
+who_data$Country[who_data$Country=="Republic of Korea"]<-"South Korea"
+who_data$Country[who_data$Country=="Republic of Moldova"]<-"Moldova"
+who_data$Country[who_data$Country=="The United Kingdom"]<-"United Kingdom"
+who_data$Country[who_data$Country=="United Republic of Tanzania"]<-"Tanzania"
+who_data$Country[who_data$Country=="United States of America"]<-"United States"
+who_data$Country[who_data$Country=="Viet Nam"]<-"Vietnam"
+who_data$Country[who_data$Country=="Russian Federation"]<-"Russia"
+who_data$Country[who_data$Country=="Iran (Islamic Republic of)"]<-"Iran"
+who_data$Country[who_data$Country=="Lao People's Democratic Republic"]<-"Laos"
+who_data$Country[who_data$Country=="Micronesia (Federated States of)"]<-"Micronesia"
+# who_agg$Country[who_agg$Country=="Timor-Leste"]<-"Timor"
+who_data$Country[who_data$Country=="Venezuela (Bolivarian Republic of)"]<-"Venezuela"
+who_data$Country[who_data$Country=="Democratic Republic of the Congo"]<-"Democratic Republic of Congo"
+who_data$Country[who_data$Country=="Kosovo[1]"]<-"Kosovo"
+who_data$Country[who_data$Country=="Syrian Arab Republic"]<-"Syria"
+
+
+data_daily <- inner_join(who_data, policy_data, by = c("Country", "Date"))
+
+colSums(is.na(data_daily))
+
+# data_daily$WHO_region  <- as.factor(data_daily$WHO_region)
+sapply(data_daily, class)
+```
+
+
+```{r, include = FALSE, results='asis', message=FALSE, warning=FALSE}
+# aggregate data_daily by month
+library(dplyr)
+
+data_monthly1<- data_daily %>% group_by(Country, Code, WHO_region, Year, Month, MonthYear) %>%
+  dplyr::summarize(New_cases = sum(New_cases, na.rm = TRUE),Face_cover = max(Face_cover,na.rm = TRUE), Vaccination = max(Vaccination,na.rm = TRUE), Internal_movement=max(Internal_movement,na.rm = TRUE), Stay_home= max(Stay_home,na.rm = TRUE),  International_travel=      max(International_travel,na.rm = TRUE), .groups = "keep") %>%
+  as.data.frame()
+
+data_monthly1[,8:12] <- lapply(data_monthly1[,8:12], as.factor)
+# sapply(data_monthly1, class)
+
+
+
+#generate lagged cases column
+data_monthly <-data_monthly1 %>%  group_by(Country) %>%
+    mutate(Lag_cases = lag(New_cases))
+data_monthly$Lag_cases[is.na(data_monthly$Lag_cases)] <- 0
+data_monthly <-data_monthly [,c(1:7,13,8:12)]
+
+write.csv(who_data,"../Data/aggregated-data/data-monthly.csv", row.names = FALSE)
+```
+
+Table 3: Monthly Data
+```{r, echo= FALSE, message=FALSE, warning=FALSE}
+#View final data
+library(DT)
+d<-data_monthly[,-6]
+datatable(d, caption = htmltools::tags$caption(
+                  style = 'caption-side: bottom; text-align: center;',
+                  'Table 3: ', htmltools::em('Monthly Data'), rownames = FALSE,filter="top", options = list(pageLength = 5, autoWidth = TRUE, scrollX=T, columnDefs = list(list(width = '50px', targets = "_all")))))
+```
+
+```{r, include = FALSE, results='asis', message=FALSE, warning=FALSE}
+# aggregate data_monthly by year
+d<- data_monthly
+d[,9:13] <- sapply(d[,9:13], as.integer)
+sapply(d, class)
+data_yearly<- d %>% 
+  group_by(Country, Code, WHO_region, Year) %>%
+  dplyr::summarize(New_cases = sum(New_cases, na.rm = TRUE),Face_cover = max(Face_cover,na.rm = TRUE), Vaccination = max(Vaccination,na.rm = TRUE), Internal_movement=max(Internal_movement,na.rm = TRUE), Stay_home= max(Stay_home,na.rm = TRUE),  International_travel=      max(International_travel,na.rm = TRUE), .groups = "keep") %>%
+  as.data.frame()
+```
+
+```{r, include = FALSE, results='asis', message=FALSE, warning=FALSE}
+#yearly data
+data_2021 <- filter(data_yearly, Year=="2021")
+data_2020 <- filter(data_yearly, Year=="2020")
+```
+
+```{r, include = FALSE, results='asis', message=FALSE, warning=FALSE}
+#data with aggregated covid-cases
+data_2020_2022 <- data_yearly %>% 
+  group_by(Country, Code, WHO_region) %>%
+  dplyr::summarize(New_cases = sum(New_cases, na.rm = TRUE),Face_cover = max(Face_cover,na.rm = TRUE), Vaccination = max(Vaccination,na.rm = TRUE), Internal_movement=max(Internal_movement,na.rm = TRUE), Stay_home= max(Stay_home,na.rm = TRUE),  International_travel=      max(International_travel,na.rm = TRUE), .groups = "keep") %>%
+  as.data.frame()
+
+data_2020_2022$Year <- "2020-2022"
+data_2020_2022 <- data_2020_2022[, c(1,2,3,10,4,5,6,7,8,9)]
+```
+
+```{r, include = FALSE, results='asis', message=FALSE, warning=FALSE}
+#data with aggregated covid-cases grouped by region
+data_regional <- data_2020_2022 %>% 
+  group_by(WHO_region) %>%
+  dplyr::summarize(New_cases = sum(New_cases, na.rm = TRUE),Face_cover = max(Face_cover,na.rm = TRUE), Vaccination = max(Vaccination,na.rm = TRUE), Internal_movement=max(Internal_movement,na.rm = TRUE), Stay_home= max(Stay_home,na.rm = TRUE),  International_travel=      max(International_travel,na.rm = TRUE), .groups = "keep") %>%
+  as.data.frame()
+```
+
+```{r, include = FALSE, results='asis', message=FALSE, warning=FALSE}
+#data with aggregated covid-cases grouped by region
+data_regional <- data_2020_2022 %>% 
+  group_by(WHO_region) %>%
+  dplyr::summarize(New_cases = sum(New_cases, na.rm = TRUE),Face_cover = max(Face_cover,na.rm = TRUE), Vaccination = max(Vaccination,na.rm = TRUE), Internal_movement=max(Internal_movement,na.rm = TRUE), Stay_home= max(Stay_home,na.rm = TRUE),  International_travel=      max(International_travel,na.rm = TRUE), .groups = "keep") %>%
+  as.data.frame()
+```
+
+```{r, include = FALSE, results='asis', message=FALSE, warning=FALSE}
+#data with aggregated covid-cases grouped by policies 
+data_policies <- data_monthly %>% 
+  group_by(Face_cover, Vaccination, Internal_movement, Stay_home, International_travel) %>%
+  dplyr::summarize(New_cases = sum(New_cases, na.rm = TRUE), .groups = "keep") %>%
+  as.data.frame()
+```
+
+
+***
+
+# **Descriptive Analysis**
+
+<span style='color:black'> 
+The following sections show the results of further data exploration using numerical and graphical methods. 
+</span>
+
+## Summary Statistics
+
+<span style='color:black'> 
+The following chart displays the general summary statistics of the monthly data being used for this analysis project. All five categorical variables contain contain unequal number of factor levels. In this dataset, there are a total of 180 countries from six WHO regions. The original aggregated data was properly cleaned to exclude all the missing values. In the graph column of the chart shown below, the bar graph for each variable shows the type of distributions each variable have. The _New_cases_ variable appears to be heavily right-skewed so a proper variable transformation needs to be performed. The categorical variables appear to be roughly normal distributed with the exception of _Vaccination_, which is slightly right-tailed.The second column in the chart shows the computed mean, standard deviation, minimum, median, maximum, and interquartile range (IQR), and coefficient of variation (CV) for each quantitative variable. The variable _Year_ shows that the observations in this data are records from three different years (2020 to 2022).
+</span>
+
+```{r, echo = FALSE, results='asis', message=FALSE, warning=FALSE}
+#view summary
+library(summarytools)
+monthly_data <- data_monthly1[, -c(2,6)]
+print(dfSummary(monthly_data), method="render")
+```
+
+<span style='color:black'> 
+The summary statistics of monthly new Covid-19 cases from 2020 to 2022 for each country  in the data is shown in  _Table 4_ below. It appears that the _United States_, _India_, and _Brazil_ have the highest total and average number of positive Covid-19 cases during this time period. Meanwhile, _Turkmenistan_, _Tonga_, and _Vanuatu_ have the lowest number of Covid-19 cases in this data. However, it appears that these three countries may have inaccurate record due to their extremely low cases compare to other countries. This information is also shown in Figure 1 below. 
+</span>
+
+Table 4: Summary statistics by Country
+```{r, echo = FALSE, results='asis', message=FALSE, warning=FALSE}
+library(dplyr)
+d <- data_monthly %>%
+  group_by(Country) %>%
+  summarise(total = sum(New_cases, na.rm=T), mean = mean(New_cases, na.rm=T),median=median(New_cases, na.rm=T), maximum = max(New_cases, na.rm=T), minimum = min(New_cases, na.rm=T), IQR = IQR(New_cases, na.rm=T), quantile_25 = quantile(New_cases, na.rm=T, c(0.25)),quantile_75 = quantile(New_cases, na.rm=T, c(0.75)), .groups = "keep")
+
+# display summary data
+library(DT)
+datatable(d, caption = htmltools::tags$caption(
+                  style = 'caption-side: bottom; text-align: center;overflow: auto;position: relative;width : 100% !important;',
+                  'Table 4: ', htmltools::em('Summary statistics of Monthly New Cases (2020-2022) grouped by Country'), rownames = FALSE,filter="top", options = list(pageLength = 10, autoWidth = T, scrollX=TRUE, scrollY=F, columnDefs = list(list(width = '3px', targets = "_all")))))
+```
+
+
+
+## Data Visualization
+
+<span style='color:black'>
+The interactive bubble chart displayed below (Figure 1) shows how the total number of new cases per year for each country included in the data change every year from 2020 to 2022. The purpose of this project is to show how these cumulative Covid-19 cases is influenced by different public health policies and restrictions. Therefore, it is important to visualize the number of Covid-19 cases, which is used in the data modeling section as the response variable. In this chart, it is evident that _United States_ , _India_ , and _Brazil_ have the highest number of Covid-19 cases in 2020 and 2021. The United States remains as the country with the highest number of positive cases in 2022 and _France_ surpassed _India_ as the country with the second highest number of cases. It is also clear that the total number of cases for most countries significantly increased in 2021 compared to the recorded cases in 2020. Additionally, it is apparent that the highest number of Covid-19 cases belong to different regions. It is important to add that this analysis does not consider possible effect of each country on the number of Covid-19 cases. In order to improve the efficiency of the methods used in this analysis, the variable region is used as a between-subjects factor with a few number of groups.
+</span>
+
+```{r, echo = FALSE, fig.width=12,fig.height=7, fig.cap= "Figure 1: Covid-19 Total New Cases by Country and Year",fig.align='left',out.extra='angle=90', message=FALSE, warning=FALSE}
+library(plotly)
+
+p <- plot_ly(data_yearly,
+      x = ~Country,
+      y = ~New_cases,
+      sizes = c(10, 100),
+      marker = list(opacity = 0.7,
+            sizemode = 'diameter')) 
+p <- p %>% layout(title = 'Covid-19 Total New Cases by Country and Year',titlefont = list(
+           family = "Agency FB",
+           size = 22,
+           color = 'black') , font = list(family = "Agency FB", size = 12),
+         xaxis = list(title = ''),
+         yaxis = list(title = 'Total New Cases'), margin=0.5)
+
+p <- add_markers(p,
+      size = ~New_cases,
+      color = ~WHO_region,
+      text = ~Country, hoverinfo = "text",
+      ids = ~Country,
+      frame = ~Year,
+      showlegend = TRUE) 
+p <- animation_opts(p,
+         frame = 1000,
+         transition = 800,
+         redraw = FALSE)
+
+p <- animation_slider(p,
+           currentvalue = list(prefix = "Year "))
+p
+# widgetframe::frameWidget(p)
+```
+
+```{r, include = FALSE, fig.width=10,fig.height=6, fig.cap= "Figure 1: Covid-19 & Socio-Economic Factors",fig.align='center',out.extra='angle=90', message=FALSE, warning=FALSE}
+# ##plot monthly 
+# # Libraries
+# library(dygraphs)
+# library(xts) # To make the convertion data-frame / xts format
+# 
+# # Format 3: Several variables for each date
+# data <- data.frame(
+#   time=seq(from=Sys.Date()-40, to=Sys.Date(), by=1 ), 
+#   value1=runif(41), 
+#   value2=runif(41)+0.7
+# )
+# d<-filter(data_monthly, Year=="2021")
+# # Then you can create the xts format:
+# don=xts( x=data_monthly[,-c(1,2,3,4,5)], order.by=data_monthly$MonthYear)
+# 
+# # Chart
+# p <- dygraph(don$New_cases)%>%
+#   dyOptions( stemPlot=TRUE)
+# p
+# 
+# library(dygraphs)
+# 
+# dyTemp <- dygraph(don$Stay_home,
+#        main = "Temperature in Aranjuez")%>%
+#   dyOptions( stemPlot=TRUE)
+# 
+# widgetframe::frameWidget(dyTemp)
+```
+
+
+<span style='color:black'>
+The heatmap of correlation matrix for the different regions and policy factors is displayed in _Figure 2_ below. Generally the different levels of the factors are not correlated with each other. The highest correlation appears to be between _Internal_movement2_ and _Stay_home2_, which is reasonable because higher restrictions on stay-at-home orders should result in less number of people outside and less amount of mobility in a particular area. 
+</span>
+
+```{r, echo = FALSE, fig.cap= "Figure 2: Correlations of Policy Levels",fig.align='left', message=FALSE, warning=FALSE}
+library(ggcorrplot)
+d <- data_monthly[, c(3,9:13)]
+corr_plot <- model.matrix(~0+., data=d) %>% 
+  cor(use="pairwise.complete.obs") %>% 
+  ggcorrplot(show.diag = F, type="lower", lab=TRUE, lab_size=2)
+
+ggplotly(corr_plot)%>%layout(title ="Heatmap of the correlation matrix", 
+                             titlefont = list( family = "Agency FB",size = 26,color = 'black') , 
+                             font = list(family = "Agency FB", size = 18),margin = 0.5, yaxis = list(tickfont = 
+list(size = 12),color = 'black',title = ""), xaxis = list(tickfont = 
+list(size = 12)))
+```
+
+```{r, include=FALSE,fig.width=10,fig.height=9, include = FALSE, fig.cap= "Figure 2: Pairwise Plot of Covid-19 & Policies", message=FALSE, warning=FALSE}
+##pairwise
+# library(ggplot2)
+# library(GGally)
+# library(dplyr)
+# # dt1 <- data_month
+# # dt1[,6:10] <- sapply(dt1[,6:10], as.integer)
+# 
+# lowerFn <- function(data, mapping, method = "lm", ...) {
+#   p <- ggplot(data = data, mapping = mapping) +
+#     geom_point(colour = "indianred2") +
+#     geom_smooth(method = method, color = "white",size = 0.25,se = TRUE, ...)
+#   p
+# }
+# sapply(data_monthly, class)
+# q<-ggpairs(data_monthly%>% select(New_cases ,Face_cover,Vaccination,Internal_movement,Stay_home, International_travel), upper = list(continuous = wrap(lowerFn, method = "lm", colour="indianred2", size = 1)) 
+#             , diag=list(continuous=wrap("densityDiag", colour="indianred2", size = 0.5)),
+#             , lower = list(continuous = wrap("cor", colour="white", size = 3))
+#             , axisLabels =  "none", title = "Pairwise Plot of Covid-19 and Policies")+theme_dark()
+# q
+
+# install.packages('devtools')
+# devtools::install_github('bbc/bbplot')
+
+# library(bbplot)
+# data_monthly  %>%
+#   select(Year, New_cases ,Face_cover,Vaccination,Internal_movement,Stay_home, International_travel) %>% 
+#   ggpairs(columns = 2:7, 
+#           ggplot2::aes(colour = as.factor(Year), 
+#           alpha = 0.9), axisLabels =  "none") + 
+#   bbplot::bbc_style() +
+#   scale_fill_manual(values = c("#9a031e","#00a896","#e36414","#0f4c5c")) + 
+#   scale_color_manual(values = c("#9a031e","#00a896","#e36414","#0f4c5c"))
+
+```
+
+
+<span style='color:black'>
+The histogram below shows the frequency of the different regions and levels of policies and restrictions using the data aggregated by year and month (Table 3). The histogram shows that the region and policy factors are roughly normally distributed. It also shows the these factors have unequal number of levels, which results in an imbalanced model design.  
+</span>
+
+```{r, echo = FALSE,  fig.width=10,fig.height=6, fig.cap= "Figure 3: Histogram of Categorical Region and Policy Variables ",fig.align='left', message=FALSE, warning=FALSE}
+# library
+library(ggplot2)
+library(plotly)
+library(hrbrthemes)
+
+data_monthly$main1 = "Face cover"
+data_monthly$main2 = "Vaccination"
+data_monthly$main3 = "Internal movement"
+data_monthly$main4 = "International travel"
+data_monthly$main5 = "Stay home"
+data_monthly$main6 = "Region"
+
+f0 <- data_monthly %>% ggplot(aes(WHO_region)) +
+  geom_histogram(stat="count", fill="cornflowerblue",alpha=0.5, col="white") + #+#FFBB00 
+  labs(x="Region",y="Counts") +
+  geom_text(geom = "text",label="",x=3.5,y=90,col="black")+ facet_wrap(~main6) + theme(text = element_text(size=10),axis.text.x = element_text(angle = 90, vjust = 0.5,size=10, hjust=1))
+
+f1 <- data_monthly %>% ggplot(aes(Face_cover)) +
+  geom_histogram(stat="count", fill="#808000",alpha=0.5, col="white") + #+#FFBB00 
+  labs(x="Face cover",y="Counts") +
+  geom_text(geom = "text",label="",x=3.5,y=90,col="black")+ facet_wrap(~main1) + theme(text = element_text(size=10),axis.text.x = element_text(angle = 90, vjust = 0.5,size=10, hjust=1))
+
+f2 <- data_monthly %>% ggplot(aes(Vaccination)) +
+  geom_histogram(stat="count",fill="sandybrown",alpha=0.5, col="white") +#+#FFBB00
+  labs(x="Vaccination",y="Counts") +
+  geom_text(geom = "text",label="",x=3.5,y=187.5,col="black")+ facet_wrap(~main2) + theme(text = element_text(size=10),axis.text.x = element_text(angle = 90, vjust = 0.5,size=10, hjust=1))
+
+f3 <- data_monthly %>% ggplot(aes(Internal_movement)) +
+  geom_histogram(stat="count",fill="#404080",alpha=0.3, col="white") + #+#FFBB00
+  labs(x="Internal movement",y="Counts") +
+  geom_text(geom = "text",label="",x=3.5,y=68,col="black")+ facet_wrap(~main3) + theme(text = element_text(size=10),axis.text.x = element_text(angle = 90, vjust = 0.5,size=10, hjust=1))
+
+f4 <- data_monthly %>% ggplot(aes(International_travel)) +
+  geom_histogram(stat="count",fill="#69b3a2",alpha=0.5, col="white") + #+#FFBB00
+  labs(x="International travel",y="Counts") +
+  geom_text(geom = "text",label="",x=3.5,y=68,col="black")+ facet_wrap(~main4) + theme(text = element_text(size=10),axis.text.x = element_text(angle = 90, vjust = 0.5,size=10, hjust=1))
+
+f5 <- data_monthly %>% ggplot(aes(Stay_home)) +
+  geom_histogram(stat="count",fill="lightsteelblue4",alpha=0.5, col="white") + #+#FFBB00
+  labs(x="Stay home",y="Counts") +
+  geom_text(geom = "text",label="",x=0.5,y=1800,col="black")+ facet_wrap(~main5) + theme(text = element_text(size=10),axis.text.x = element_text(angle = 90, vjust = 0.5,size=10, hjust=1))
+
+
+subplot(f0, f2, f3,f1 ,f4,f5, shareY = T, nrows = 1,heights =1, margin=0.005)%>% layout(title ="Histogram of Factors", titlefont = list(
+           family = "Agency FB",
+           size = 26,
+           color = 'black') , font = list(family = "Agency FB", size = 15),margin = 0.5, yaxis = list(
+        color = 'black',
+        title = "Count"))
+```
+
+<!-- <span style='color:black'> -->
+<!-- Figure 3 below shows the scatterplot of of Covid-19 cases and different policies. Based on this plot, it appears that there is a positive linear relationship between all policies except international travel where the average number of cases appear constant across its levels.   -->
+<!-- </span> -->
+
+```{r, include = FALSE, fig.width=10,fig.height=6,fig.cap= "Figure 3: Scatterplot of Covid-19 Cases and Policies", message=FALSE, warning=FALSE}
+# library(ggplot2)
+# library(plotly)
+# data_monthly$main1 = "Face cover"
+# data_monthly$main2 = "Vaccination"
+# data_monthly$main3 = "Internal movement"
+# data_monthly$main4 = "International travel"
+# data_monthly$main5 = "Stay home"
+# 
+# f1 <- data_monthly%>% 
+#   ggplot(aes(y=New_cases,x=as.integer(Face_cover))) +
+#   geom_point(alpha=0.1, color="#808000") + 
+#   labs(x="Total New Cases", y= "Face Cover",
+#        title="") +
+#   scale_y_log10()+ facet_wrap(~main1) +
+#   geom_smooth(method=lm , color="darkgrey", fill="#808000", level = 0.95, se=T,size=0.5) 
+# 
+# f2 <- data_monthly%>% 
+#   ggplot(aes(y=New_cases,x=as.integer(Vaccination))) +
+#   geom_point(alpha=0.1, color="cornflowerblue") + 
+#   labs(x="Total New Cases", y= "Face Cover",
+#        title="") +
+#   scale_y_log10()+ facet_wrap(~main2) +
+#   geom_smooth(method=lm , color="darkgrey", fill="cornflowerblue", level = 0.95, se=T,size=0.5) 
+# 
+# f3 <- data_monthly%>% 
+#   ggplot(aes(y=New_cases,x=as.integer(Internal_movement))) +
+#   geom_point(alpha=0.1,  color="#FFBB00") + 
+#   labs(x="Total New Cases", y= "Face Cover",
+#        title="") +
+#   scale_y_log10()+  facet_wrap(~main3) +
+#   geom_smooth(method=lm , color="darkgrey", fill="#FFBB00", level = 0.95, se=T,size=0.5) 
+# 
+# f4 <- data_monthly%>% 
+#   ggplot(aes(y=New_cases,x=as.integer(International_travel))) +
+#   geom_point(alpha=0.1,  color="#69b3a2") + 
+#   labs(x="Total New Cases", y= "Face Cover",
+#        title="") +
+#   scale_y_log10()+  facet_wrap(~main4) +
+#   geom_smooth(method=lm , color="darkgrey", fill="#69b3a2", level = 0.95, se=T,size=0.5) 
+# 
+# f5 <- data_monthly%>% 
+#   ggplot(aes(y=New_cases,x=as.integer(Stay_home))) +
+#   geom_point(alpha=0.1,  color="#404080") + 
+#   labs(x="Total New Cases", y= "Face Cover",
+#        title="") +
+#   scale_y_log10()+ facet_wrap(~main5) +
+#   geom_smooth(method=lm , color="darkgrey", fill="#404080", level = 0.95, se=T,size=0.5) 
+# 
+# 
+# # subplot(f2, f3,f1 ,f4,f5, shareY = T, nrows = 1,heights = 0.92)%>% layout(title ="Scatterplot of Covid-19 Cases and Policies")
+# subplot(f2, f3,f1 ,f4,f5, shareY = T, shareX=F,nrows = 1, margin=0.005)%>% layout(title ="Scatterplot of Covid-19 Cases and Policies", titlefont = list(
+#            family = "Agency FB",
+#            size = 26,
+#            color = 'black') , font = list(family = "Agency FB", size = 18),margin = 0.5, yaxis = list(
+#         color = 'black',
+#         title = "Monthly Covid-19 Cases"))
+```
+
+
+<span style='color:black'>
+The attached figure below (Figure 4) shows the boxplot of total monthly Covid-19 cases in the data (Table 3) under different regions and policy factors. Since the means (red dots) within each plot does not follow a horizontal trend, this means that the regions and policies shown have an impact on the number of cases.  The means of the number of cases vary across all factor levels within region and each policy variable.  The boxplot of _Lag_cases_ does not differ significantly from the boxplot using _New_cases_. Therefore, it is not necessary to use _Lag_cases_ for this project.   
+</span>
+
+```{r echo=FALSE, fig.align='left', fig.cap="Figure 4: Boxplot of Covid-19 and Policies ", fig.height=6, fig.width=10, message=FALSE, warning=FALSE}
+
+
+```
+
+```{r echo=FALSE, fig.align='left', fig.cap="Figure 4: Boxplot of Covid-19 and Policies ", fig.height=6, fig.width=10, message=FALSE, warning=FALSE}
+
+F0<- ggplot(data = data_monthly, aes(y=New_cases,x=as.factor(WHO_region),color="grey"))+
+# ggplot(Wage, aes(occupation,wage,fill=occupation))+ #to leave them alphabetic
+  geom_jitter(colour = "dark gray",alpha =0.5, width=.1, size=0.5) +
+  stat_boxplot(geom ='errorbar',width = 0.05, color="black") +
+  geom_boxplot(fill="cornflowerblue", color="black", alpha=0.8)+
+  labs(title="", 
+       x = "Region",
+       y = "Monthly Covid-19 Cases",
+       #subtitle ="Gray dots=sample data points, Black dot=outlier, Blue dot=mean, Red=99% confidence interval",
+       caption = "") +
+  guides(fill=FALSE) +
+  #stat_summary(fun.data = "mean_cl_normal", colour = "red", size = 1.5, fun.args = list(conf.int=.99)) +
+  stat_summary(geom="point", fun.y=mean, color="red")+ facet_wrap(~main6) + 
+  theme(text = element_text(size=10), axis.text.x = element_text(angle = 90, vjust = 0.5,size=10, hjust=1)) +
+  scale_y_log10()
+
+
+F1<-data_monthly %>% ggplot(aes(y=New_cases,x=as.factor(Face_cover),color="grey"))+
+# ggplot(Wage, aes(occupation,wage,fill=occupation))+ #to leave them alphabetic
+  geom_jitter(colour = "dark gray",alpha =0.5, width=.1, size=0.5) +
+  stat_boxplot(geom ='errorbar',width = 0.05, color="black") +
+  geom_boxplot(fill="#808000", color="black", alpha=0.8)+
+  labs(title="", 
+       x = "Face cover",
+       y = "Monthly Covid-19 Cases",
+       #subtitle ="Gray dots=sample data points, Black dot=outlier, Blue dot=mean, Red=99% confidence interval",
+       caption = "") +
+  guides(fill=FALSE) +
+  #stat_summary(fun.data = "mean_cl_normal", colour = "red", size = 1.5, fun.args = list(conf.int=.99)) +
+  stat_summary(geom="point", fun.y=mean, color="red")+ facet_wrap(~main1) + theme(text = element_text(size=10),axis.text.x = element_text(angle = 90, vjust = 0.5,size=10, hjust=1)) +
+  scale_y_log10()
+
+F2 <- data_monthly %>% ggplot( aes(y=New_cases,x=as.factor(Vaccination),color="grey"))+
+# ggplot(Wage, aes(occupation,wage,fill=occupation))+ #to leave them alphabetic
+  geom_jitter(colour = "dark gray",alpha =0.5, width=.1, size=0.5) +
+  stat_boxplot(geom ='errorbar',width = 0.05, color="black") +
+  geom_boxplot(fill="sandybrown", color="black", alpha=0.8)+
+  labs(title="", 
+       x = "Vaccination",
+       y = "Monthly Covid-19 Cases",
+       #subtitle ="Gray dots=sample data points, Black dot=outlier, Blue dot=mean, Red=99% confidence interval",
+       caption = "") +
+  guides(fill=FALSE) +
+  #stat_summary(fun.data = "mean_cl_normal", colour = "red", size = 1.5, fun.args = list(conf.int=.99)) +
+  stat_summary(geom="point", fun.y=mean, color="red")+ facet_wrap(~main2) + theme(text = element_text(size=10),axis.text.x = element_text(angle = 90, vjust = 0.5,size=10, hjust=1)) +
+  scale_y_log10()
+
+
+F3 <- data_monthly %>% ggplot( aes(y=New_cases,x=as.factor(Internal_movement),color="grey"))+
+# ggplot(Wage, aes(occupation,wage,fill=occupation))+ #to leave them alphabetic
+  geom_jitter(colour = "dark gray",alpha =0.5, width=.1, size=0.5) +
+  stat_boxplot(geom ='errorbar',width = 0.05, color="black") +
+  geom_boxplot(fill="#404080", color="black", alpha=0.8)+
+  labs(title="", 
+       x = "Internal movement",
+       y = "Monthly Covid-19 Cases",
+       #subtitle ="Gray dots=sample data points, Black dot=outlier, Blue dot=mean, Red=99% confidence interval",
+       caption = "") +
+  guides(fill=FALSE) +
+  #stat_summary(fun.data = "mean_cl_normal", colour = "red", size = 1.5, fun.args = list(conf.int=.99)) +
+  stat_summary(geom="point", fun.y=mean, color="red")+ facet_wrap(~main3) + theme(text = element_text(size=10),axis.text.x = element_text(angle = 90, vjust = 0.5,size=10, hjust=1)) +
+  scale_y_log10()
+  
+
+F4 <- data_monthly %>% ggplot(aes(y=New_cases,x=as.factor(International_travel),color="grey"))+
+# ggplot(Wage, aes(occupation,wage,fill=occupation))+ #to leave them alphabetic
+  geom_jitter(colour = "dark gray",alpha =0.5, width=.1, size=0.5) +
+  stat_boxplot(geom ='errorbar',width = 0.05, color="black") +
+  geom_boxplot(fill="#69b3a2", color="black", alpha=0.8)+
+  labs(title="", 
+       x = "International travel",
+       y = "Monthly Covid-19 Cases",
+       #subtitle ="Gray dots=sample data points, Black dot=outlier, Blue dot=mean, Red=99% confidence interval",
+       caption = "") +
+  guides(fill=FALSE) +
+  #stat_summary(fun.data = "mean_cl_normal", colour = "red", size = 1.5, fun.args = list(conf.int=.99)) +
+  stat_summary(geom="point", fun.y=mean, color="red")+ facet_wrap(~main4) + theme(text = element_text(size=10),axis.text.x = element_text(angle = 90, vjust = 0.5,size=10, hjust=1)) +
+  scale_y_log10()
+ 
+
+F5 <- data_monthly %>% ggplot(aes(y=New_cases,x=as.factor(Stay_home),color="grey"))+
+# ggplot(Wage, aes(occupation,wage,fill=occupation))+ #to leave them alphabetic
+  geom_jitter(colour = "dark gray",alpha =0.5,width=.1, size=0.5) +
+  stat_boxplot(geom ='errorbar',width = 0.05, color="black") +
+  geom_boxplot(fill="lightsteelblue4", color="black", alpha=0.8)+
+  labs(title="", 
+       x = "Stay home",
+       y = "Monthly Covid-19 Cases",
+       #subtitle ="Gray dots=sample data points, Black dot=outlier, Blue dot=mean, Red=99% confidence interval",
+       caption = "") +
+  guides(fill=FALSE) +
+  #stat_summary(fun.data = "mean_cl_normal", colour = "red", size = 1.5, fun.args = list(conf.int=.99)) +
+  stat_summary(geom="point", fun.y=mean, color="red") + 
+  facet_wrap(~main5) + theme(text = element_text(size=10),axis.text.x = element_text(angle = 90, vjust = 0.5,size=10, hjust=1)) +
+  scale_y_log10()
+
+
+# subplot(f2, f3,f1 ,f4,f5, shareX = T,margin = 0.005, nrows=5)%>% layout(title ="Scatterplot of Covid-19 Cases and Policies", titlefont = list(
+#            family = "Agency FB",
+#            size = 12,
+#            color = 'black'))
+
+
+
+
+subplot(F0, F2, F3, F1, F4, F5, shareY = T, nrows = 1,  heights=1, margin=0.005)%>% layout(title ="Boxplot of Covid-19 and Policies", titlefont = list(
+           family = "Agency FB",
+           size = 26,
+           color = 'black') , font = list(family = "Agency FB", size = 18),margin = 0.5, yaxis = list(
+        color = 'black',
+        title = "Monthly Covid-19 Cases"))
+
+```
+
+
+```{r, include=FALSE, fig.width=10,fig.height=6,fig.cap= "Figure 4.2: Boxplot of Lagged Covid-19 and Policies ",fig.align='left',message=FALSE, warning=FALSE}
+# # library
+# library(ggridges)
+# library(ggplot2)
+# library(viridis)
+# library(hrbrthemes)
+# 
+# data_monthly$main1 = "Face cover"
+# data_monthly$main2 = "Vaccination"
+# data_monthly$main3 = "Internal movement"
+# data_monthly$main4 = "International travel"
+# data_monthly$main5 = "Stay home"
+
+# ####Outcome vs school Type
+# f1<-ggplot(data_monthly, aes(y=Lag_cases,x=as.factor(Face_cover),color="grey"))+
+# # ggplot(Wage, aes(occupation,wage,fill=occupation))+ #to leave them alphabetic
+#   geom_jitter(colour = "dark gray",alpha =0.5, width=.1, size=0.5) +
+#   stat_boxplot(geom ='errorbar',width = 0.15, color="black") +
+#   geom_boxplot(fill="#808000", color="darkgrey", alpha=0.8)+
+#   labs(title="", 
+#        x = "Face cover",
+#        y = "Monthly Covid-19 Cases",
+#        subtitle ="Gray dots=sample data points, Black dot=outlier, Blue dot=mean, Red=99% confidence interval",
+#        caption = "") +
+#   guides(fill=FALSE) +
+#   stat_summary(fun.data = "mean_cl_normal", colour = "red", size = 1.5, fun.args = list(conf.int=.99)) +
+#   stat_summary(geom="point", fun.y=mean, color="red") + theme(text = element_text(size=10),axis.text.x = element_text(size=10, hjust=1)) +
+#   scale_y_log10()+ facet_wrap(~main1)
+# 
+# f2 <- ggplot(data_monthly, aes(y=Lag_cases,x=as.factor(Vaccination),color="grey"))+
+# # ggplot(Wage, aes(occupation,wage,fill=occupation))+ #to leave them alphabetic
+#   geom_jitter(colour = "dark gray",alpha =0.5, width=.1, size=0.5) +
+#   stat_boxplot(geom ='errorbar',width = 0.15, color="black") +
+#   geom_boxplot(fill="sandybrown", color="darkgrey", alpha=0.8)+
+#   labs(title="", 
+#        x = "Vaccination",
+#        y = "Monthly Covid-19 Cases",
+#        subtitle ="Gray dots=sample data points, Black dot=outlier, Blue dot=mean, Red=99% confidence interval",
+#        caption = "") +
+#   guides(fill=FALSE) +
+#   stat_summary(fun.data = "mean_cl_normal", colour = "red", size = 1.5, fun.args = list(conf.int=.99)) +
+#   stat_summary(geom="point", fun.y=mean, color="red") + theme(text = element_text(size=10),axis.text.x = element_text(size=10, hjust=1)) +
+#   scale_y_log10()+ facet_wrap(~main2)
+
+
+# f3 <- ggplot(data_monthly, aes(y=Lag_cases,x=as.factor(Internal_movement),color="grey"))+
+# # ggplot(Wage, aes(occupation,wage,fill=occupation))+ #to leave them alphabetic
+#   geom_jitter(colour = "dark gray",alpha =0.5, width=.1, size=0.5) +
+#   stat_boxplot(geom ='errorbar',width = 0.15, color="black") +
+#   geom_boxplot(fill="#404080", color="darkgrey", alpha=0.8)+
+#   labs(title="", 
+#        x = "Internal movement",
+#        y = "Monthly Covid-19 Cases",
+#        subtitle ="Gray dots=sample data points, Black dot=outlier, Blue dot=mean, Red=99% confidence interval",
+#        caption = "") +
+#   guides(fill=FALSE) +
+#   stat_summary(fun.data = "mean_cl_normal", colour = "red", size = 1.5, fun.args = list(conf.int=.99)) +
+#   stat_summary(geom="point", fun.y=mean, color="red") + theme(text = element_text(size=10),axis.text.x = element_text(size=10, hjust=1)) +
+#   scale_y_log10()+ facet_wrap(~main3)
+#   
+# 
+# f4 <- ggplot(data_monthly, aes(y=Lag_cases,x=as.factor(International_travel),color="grey"))+
+# # ggplot(Wage, aes(occupation,wage,fill=occupation))+ #to leave them alphabetic
+#   geom_jitter(colour = "dark gray",alpha =0.5, width=.1, size=0.5) +
+#   stat_boxplot(geom ='errorbar',width = 0.15, color="black") +
+#   geom_boxplot(fill="#69b3a2", color="darkgrey", alpha=0.8)+
+#   labs(title="", 
+#        x = "International travel",
+#        y = "Monthly Covid-19 Cases",
+#        subtitle ="Gray dots=sample data points, Black dot=outlier, Blue dot=mean, Red=99% confidence interval",
+#        caption = "") +
+#   guides(fill=FALSE) +
+#   stat_summary(fun.data = "mean_cl_normal", colour = "red", size = 1.5, fun.args = list(conf.int=.99)) +
+#   stat_summary(geom="point", fun.y=mean, color="red") + theme(text = element_text(size=10),axis.text.x = element_text(size=10, hjust=1)) +
+#   scale_y_log10()+ facet_wrap(~main4)
+  
+
+
+# f5 <- ggplot(data_monthly, aes(y=Lag_cases,x=as.factor(Stay_home),color="grey"))+
+# # ggplot(Wage, aes(occupation,wage,fill=occupation))+ #to leave them alphabetic
+#   geom_jitter(colour = "dark gray",alpha =0.5, width=.1, size=0.5) +
+#   stat_boxplot(geom ='errorbar',width = 0.15, color="black") +
+#   geom_boxplot(fill="lightsteelblue4", color="darkgrey", alpha=0.8)+
+#   labs(title="", 
+#        x = "Stay home",
+#        y = "Monthly Covid-19 Cases",
+#        subtitle ="Gray dots=sample data points, Black dot=outlier, Blue dot=mean, Red=99% confidence interval",
+#        caption = "") +
+#   guides(fill=FALSE) +
+#   stat_summary(fun.data = "mean_cl_normal", colour = "red", size = 1.5, fun.args = list(conf.int=.99)) +
+#   stat_summary(geom="point", fun.y=mean, color="red") + theme(text = element_text(size=10),axis.text.x = element_text(size=10, hjust=1)) +
+#   scale_y_log10()+ facet_wrap(~main5)
+# 
+# 
+# 
+# # subplot(f2, f3,f1 ,f4,f5, shareX = T,margin = 0.005, nrows=5)%>% layout(title ="Scatterplot of Covid-19 Cases and Policies", titlefont = list(
+# #            family = "Agency FB",
+# #            size = 12,
+# #            color = 'black'))
+# 
+# subplot(f2, f3,f1 ,f4,f5, shareY = T, nrows = 1, heights=1, margin=0.005)%>% layout(title ="Boxplot of Covid-19 Lag and Policies", titlefont = list(
+#            family = "Agency FB",
+#            size = 26,
+#            color = 'black') , font = list(family = "Agency FB", size = 18),margin = 0.5, yaxis = list(
+#         color = 'black',
+#         title = "Monthly Covid-19 Cases"))
+```
+
+***
+
+# **Exploratory Analysis**
+
+<span style='color:black'> 
+In order to further explore the data used for this analysis, the following method is used. 
+</span>
+
+
+## Multiple correspondence analysis (MCA)
+
+The goal in this section is to identify any possible similarities between categorical predictors in the data that are used in the data modelling section. In order to perform this task, a method that is specifically used for summarizing and visualizing data that contains more than one categorical variables is used. The _multiple correspondence analysis_ (MCA) method is similar to _principal component analysis_ (PCA) but more useful when the data is categorical. Using this method, the significant variables that contribute the most in explaining the variations in the data can also be identified. In order to improve process efficiency, the data used in this section is an aggregated yearly data where the number of cumulative cases for each country every year are aggregated as total number of cases from 2020 to 2022 and the maximum policy imposed are retained. In terms of MCA, the categorical region and policies are used as the _active variables_, which are the variables that are passed into the MCA() function. The different countries are the _active individuals_, which represent the observations or rows included in the MCA. The number of Covid-19 cases are used as the _supplementary variable_, which are not included in the MCA but their coordinates can be predicted by the MCA using the _active variables_ and _active individuals_. The histogram of the active variables (policies) in Figure 3 in the previous section does not show any categories with extremely small frequency. The lowest predictor level frequency is equal to 138, which is from vaccination with level 1. This value should be large enough to not cause any distortion in MCA.  
+
+
+
+```{r, echo= FALSE, message=FALSE, warning=FALSE}
+# install.packages(c("FactoMineR", "factoextra"))
+library("FactoMineR")
+library("factoextra")
+data_2020_2022[,c(3,6:10)] <- lapply(data_2020_2022[,c(3,6:10)], as.factor)
+# sapply(data_2020_2022, class)
+active <- data_2020_2022[, c(3,6:10)]
+# number of categories per variable
+n = apply(active, 2, function(x) nlevels(as.factor(x)))
+# head(active[, 1:6], 3)
+#perform MCA
+mca <- MCA(active, graph = FALSE)
+# print(mca)
+```
+
+
+To visualize the proportion of variances explained by each MCA dimension, the function _fviz_screeplot()_ is used and the generated Scree plot is shown in Figure 5 below. This Scree plot can be interpreted in a similar way as the PCA Scree plots for principal components. The scree plot below does not appear to have any significant drop or "elbow". Therefore, it can be inferred that there are no dominating directions that exist in the data. 
+
+```{r, echo= FALSE, fig.cap = "Figure 5: MCA Scree plot", fig.align = 'left', message=FALSE, warning=FALSE}
+# Eigenvalues / Variances
+library("factoextra")
+eig.val <- get_eigenvalue(mca)
+fviz_screeplot(mca, addlabels = TRUE, ylim = c(0, 18))
+
+```
+
+The function _fviz_mca_biplot()_ is used to draw the MCA Biplot of individuals and variable categories or levels in Figure 6 below. 
+This plot shows an overall pattern within the data. Observations (rows or individuals) are represented by blue points and columns (active variable categories) are the triangles color coded by contribution to the MCA dimension. In this plot, the distance between the row points or column points can be used to measure their similarity or dissimilarity depending on how close the distance is. For example, _Stay_home_1_, _Internal_movement_1_, and _International_travel_3_ are fairly close to each other in this plot and highly contribute to MCA dimension 1 (x-axis). Therefore, it can be concluded that they have similar profiles. These three variable categories or levels also contribute to MCA dimension 2 (y-axis). 
+
+
+
+```{r, echo= FALSE, fig.cap = "Figure 6: MCA Biplot", fig.align = 'left', message=FALSE, warning=FALSE}
+# Biplot
+# fviz_mca_biplot(mca, 
+#                repel = TRUE, # avoid text overlapping 
+#                ggtheme = theme_gray())
+
+fviz_mca_biplot(mca, col.var = "contrib",
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+             repel = TRUE, # avoid text overlapping (slow)
+             ggtheme = theme_gray()
+             )
+```
+
+```{r, echo= FALSE, message=FALSE, warning=FALSE}
+# Graph of variables
+var <- get_mca_var(mca)
+# Coordinates
+# head(var$coord)
+# # Cos2: quality on the factore map
+# head(var$cos2)
+# # Contributions to the principal components
+# head(var$contrib)
+```
+
+The correlation between variables and MCA principal dimensions can also be assessed using the plot of MCA variables in Figure 7 below. Using this plot, we can identify which of the variables contribute the most to MCA dimensions 1 (x-axis) and 2 (y-axis). In this plot, the squared correlations between MCA dimensions and the variables are used as coordinates. It is apparent that, the variables _Stay_home_ and _Internal_movement_ are the most correlated with MCA dimension 1. These two variables are also the most correlated with MCA dimension 2.
+
+```{r, echo= FALSE, fig.cap = "Figure 7: MCA Variables", fig.align = 'left', message=FALSE, warning=FALSE}
+fviz_mca_var(mca, choice = "mca.cor", 
+            repel = TRUE, # Avoid text overlapping (slow)
+            ggtheme = theme_gray())
+```
+
+```{r, include= FALSE, message=FALSE, warning=FALSE}
+# # data frames for ggplot
+# library(plotly)
+# mca_vars_df = data.frame(mca$var$coord, Variable = rep(names(n), n))
+# mca_obs_df = data.frame(mca$ind$coord)
+# 
+# # plot of variable categories
+# w<-ggplot(data = mca_vars_df, aes(x = Dim.1, y = Dim.2, label = rownames(mca_vars_df))) + 
+#     geom_hline(yintercept = 0, colour = "gray70") + geom_vline(xintercept = 0, 
+#     colour = "gray70") + geom_text(aes(colour = Variable)) + ggtitle("MCA plot of variables using R package FactoMineR")+ xlim(-4, 5.8)+ylim(-3,4)
+# ggplotly(w)
+# 
+
+```
+
+
+
+
+<!-- ## Categorical Feature Selection  -->
+
+<!-- Determine which features/policies are the most important using different methods   -->
+
+<!-- ### Boruta  -->
+
+```{r, echo= FALSE, message=FALSE, warning=FALSE}
+# library(Boruta)
+# # dt1 <- data_month
+# # dt1[,6:10] <- sapply(dt1[,6:10], as.integer)
+# # Perform Boruta search
+# boruta_output <- Boruta(New_cases ~ Face_cover+Vaccination+Internal_movement+Stay_home+ International_travel, data=na.omit(data_monthly), doTrace=0)  
+# 
+# names(boruta_output)
+# 
+# # Get significant variables including tentatives
+# boruta_signif <- getSelectedAttributes(boruta_output, withTentative = TRUE)
+# print(boruta_signif)  
+# 
+# # Do a tentative rough fix
+# roughFixMod <- TentativeRoughFix(boruta_output)
+# boruta_signif <- getSelectedAttributes(roughFixMod)
+# print(boruta_signif)
+# 
+# # Variable Importance Scores
+# imps <- attStats(roughFixMod)
+# imps2 = imps[imps$decision != 'Rejected', c('meanImp', 'decision')]
+# head(imps2[order(-imps2$meanImp), ])  # descending sort
+# 
+# # Plot variable importance
+# plot(boruta_output, cex.axis=.5, las=2, xlab="", main="Variable Importance")  
+
+# library(ggplot2)
+# ggplot(boruta_output)
+```
+
+<!-- ### Lasso Regression  -->
+
+```{r, include = FALSE, message=FALSE, warning=FALSE}
+# library(glmnet)
+# dt1 <- data_month
+# dt1[,6:10] <- sapply(dt1[,6:10], as.integer)
+# outcome=dt1$New_cases;
+# x <-as.matrix(dt1[,6:10])
+# cv.linear.fit <- cv.glmnet(x, outcome, family = "gaussian")
+# plot(cv.linear.fit)
+# 
+# ## Report number of features included in the optimal model
+# sum(coef(cv.linear.fit, s = "lambda.min") != 0) 
+# 
+# ## Find names of the selected features
+# coefs <- coef(cv.linear.fit, s = "lambda.min") 
+# (linear.selected.variable<-which(coefs[,1]!=0) )
+# linear.selected.variable<-linear.selected.variable[linear.selected.variable!=1]-1
+# linear.selected.mat =as.matrix(x[,linear.selected.variable])
+
+#####
+# x <- as.matrix(data_monthly[,8:12]) # all X vars
+# y <- data_monthly$New_cases # Only Class
+# 
+# # Fit the LASSO model (Lasso: Alpha = 1)
+# set.seed(100)
+# cv.lasso <- cv.glmnet(x, y, family='gaussian', alpha=1, parallel=TRUE, standardize=TRUE, type.measure='auc')
+# 
+# # Results
+# plot(cv.lasso)
+# 
+# # plot(cv.lasso$glmnet.fit, xvar="lambda", label=TRUE)
+# cat('Min Lambda: ', cv.lasso$lambda.min, '\n 1Sd Lambda: ', cv.lasso$lambda.1se)
+# df_coef <- round(as.matrix(coef(cv.lasso, s=cv.lasso$lambda.min)), 2)
+# 
+# # See all contributing variables
+# df_coef[df_coef[, 1] != 0, ]
+```
+
+
+<!-- ### Stepwise Regression  -->
+
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+# dt1 <- data_month
+# dt1[,6:10] <- sapply(dt1[,6:10], as.integer)
+
+# base.mod <- lm(New_cases ~ 1 , data= data_monthly)  # base intercept only model
+# all.mod <- lm(New_cases ~ Face_cover+Vaccination+Internal_movement+Stay_home+ International_travel, data= data_monthly) # full model with all predictors
+# stepMod <- step(base.mod, scope = list(lower = base.mod, upper = all.mod), direction = "both", trace = 0, steps = 1000)  # perform step-wise algorithm
+# shortlistedVars <- names(unlist(stepMod[[1]])) # get the shortlisted variable.
+# shortlistedVars <- shortlistedVars[!shortlistedVars %in% "(Intercept)"]  # remove intercept 
+# print(shortlistedVars)
+```
+<!-- ### Step wise Forward and Backward Selection -->
+
+```{r, include = FALSE, message=FALSE, warning=FALSE}
+# Step 1: Define base intercept only model
+# base.mod1 <- lm(New_cases ~ 1 , data=data_monthly)  
+# 
+# # Step 2: Full model with all predictors
+# all.mod1 <- lm(New_cases ~ Face_cover+Vaccination+Internal_movement+Stay_home+ International_travel, data= data_monthly) 
+# 
+# # Step 3: Perform step-wise algorithm. direction='both' implies both forward and backward stepwise
+# stepMod1 <- step(base.mod1, scope = list(lower = base.mod1, upper = all.mod1), direction = "both", trace = 0, steps = 1000)  
+# 
+# # Step 4: Get the shortlisted variable.
+# shortlistedVars1 <- names(unlist(stepMod1[[1]])) 
+# shortlistedVars1 <- shortlistedVars[!shortlistedVars1 %in% "(Intercept)"] # remove intercept
+# 
+# # Show
+# print(shortlistedVars)
+```
+
+
+<!-- ### Chi- Squared Test -->
+
+
+***
+
+
+
+# **Inferential Analysis**
+
+<span style='color:black'> 
+Since the variables included in the data are categorical and the questions of interest for this analysis are primarily focused on the effects of the different levels in these predictors on the total number of positive Covid-19 cases worldwide, using analysis of variance (ANOVA) can help determine if the dependent variable (Covid-19 cases) changes according to the level of the independent variables (policies). 
+</span>
+
+## Variable Transformation 
+
+<span style='color:black'> 
+For this analysis, it can be tested whether _New_cases_ can be transformed in order to remove its heavy right-skewed distribution. This variable is used as the response for the ANOVA model in the following section. Therefore, it is crucial to determine if this variable violates the normality assumption or not.  Although the residual follow a constant variance, we can see from the normal Q-Q plot below (Figure 8) that the residuals are heavily right-tailed. The log transformation plot below (Figure 9) shows that the distribution of the _New_cases_ variable is normally distributed after performing the log transformation. Thus, the ANOVA model can be fitted using the log of _New_cases_. 
+</span>
+
+```{r, echo = FALSE,  fig.align = 'left', fig.cap = 'Figure 8: Diagnostic Plot',message=FALSE, warning=FALSE}
+##Box-cox transformation
+d<- data_monthly1[-1,c(3,7:12)]
+fit1<-aov(New_cases~., data=d) #first-order model with the (non-transformed) variables
+par(mfrow=c(2,2))
+plot(fit1,pch =20, cex = 2, col = "cornflowerblue")
+# summary(fit1)
+# ###The Box-Cox likelihood suggests a power transformation with power -0.02.
+# bc<-MASS::boxcox(fit1, lambda = seq(-4, 4, by = 0.01),plotit = T)
+data_monthly2 <- data_monthly1
+data_monthly2$New_cases <- log(data_monthly2$New_cases)
+data_monthly2$New_cases[which(!is.finite(data_monthly2$New_cases))] <- 0 #replace inf val with 0 for log(0) = inf
+```
+
+
+```{r, echo = FALSE,  fig.align = 'left', fig.cap = ' Figure 9: Log transformation of response variable', message=FALSE, warning=FALSE}
+library(ggplot2)
+library(plotly)
+f2 <- ggplot(data_monthly1, aes(x = New_cases)) + xlab("Histogram of New_cases") +
+    geom_histogram(aes(y = ..density..),bins = 30, fill = "#69b3a2", color = "white",alpha=0.8) +
+                stat_function(fun = dnorm,
+                args = list(mean = mean(data_monthly1$New_cases),
+                            sd = sd(data_monthly1$New_cases)),
+                col = "grey40",
+                size = 0.5)+labs(x="Histogram of New_cases")
+
+f4 <- ggplot(data_monthly1, aes(x = log(data_monthly1$New_cases))) +
+    geom_histogram(aes(y = ..density..),bins = 30, fill = "#69b3a2", color = "white",alpha=0.8) +
+                stat_function(fun = dnorm,
+                args = list(mean = mean(log(data_monthly1$New_cases)),
+                            sd = sd(log(data_monthly1$New_cases))),
+                col = "grey40",
+                size = 1)+labs(x="Histogram of log(New_cases)")
+
+plotly::subplot(f2, f4, nrows=1, shareX=F, shareY=F, margin =0.02,titleX = TRUE)%>% layout(title ="Log Transformation", titlefont = list(
+           family = "Agency FB",
+           size = 26,
+           color = 'black') , font = list(family = "Agency FB", size = 18),margin = 0.1, yaxis = list(
+        color = 'black'))
+```
+
+
+
+
+## Fixed-effect ANOVA Model
+
+<span style='color:black'> 
+For this analysis, the proposed fixed-effect ANOVA model with multiple factors in the factor-effect form defined below uses the categorical policy variables (Face_cover ($\alpha$), Vaccination ($\beta$),  Internal_movement ($\gamma$), Stay_home ($\delta$), International_travel ($\zeta$), WHO_region ($\eta$) for predicting New_cases. 
+
+$$Y_{ijk\ell m n o} = \mu_{\cdot\cdot }+ \alpha_i + \beta_j + \gamma_k+ \delta_{\ell} + \zeta_m + \eta_n +\epsilon_{ijk\ell m n o}$$
+where 
+
+$o = 1, 2, \cdots, n_{ijk\ell m n}$,  where  $n_{ijk\ell m n}$=  is the number of observations in cell ($i,j,k,\ell,m, n$) or the combinations of the different levels of the categorical predictors 
+
+$i = 0,1,  \cdots, 4$
+
+$j = 0,1, \cdots, 5$
+
+$k = 0, 1, 2$
+
+$\ell = 0, 1, \cdots, 3$
+
+$m = 0, 1, \cdots, 4$
+
+$n = 1, 2, \cdots, 6$
+
+$\epsilon_{ijk\ell m n o}$ (error terms) are i.i.d. $N(0,\sigma^2)$
+
+$Y_{ijk\ell m n o}$ = $o^{th}$ observation from the $i^{th}$ level of Face_cover, $j^{th}$ level of Vaccination, $k^{th}$ level of Internal_movement, $\ell ^{th}$ level of Stay_home, $m ^{th}$ level of International_travel policies, and $n ^{th}$ group of WHO_region. 
+
+$\mu_{\cdot\cdot }  = \sum_{i=0}^{4} \sum_{j=0}^{5}  \sum_{k=0}^{2} \sum_{\ell=0}^{3} \sum_{m=0}^{4} \sum_{n=1}^{6}  \frac{\mu_{ijk\ell m}}{ijk\ell m}$ (overall mean across all populations)
+
+$\alpha_i = \mu_{i\cdot} - \mu_{\cdot\cdot}$ = factor effect of Face_cover with $\sum_{i=0}^{4} \alpha_i = 0$ constraint
+
+$\beta_j = \mu_{j\cdot} - \mu_{\cdot\cdot}$ = factor effect of Vaccination with $\sum_{j=0}^{5} \beta_j =0$ constraint
+
+$\gamma_k = \mu_{k\cdot} - \mu_{\cdot\cdot}$ = factor effect of Internal_movement with $\sum_{k=0}^{2} \gamma_k =0$ constraint
+
+$\delta_{\ell}  = \mu_{\ell\cdot} - \mu_{\cdot\cdot}$ = factor effect of Stay_home with $\sum_{\ell=0}^{3} \delta_{\ell} =0$ constraint
+
+$\zeta_m = \mu_{m\cdot} - \mu_{\cdot\cdot}$ = factor effect of International_travel with $\sum_{m=0}^{4} \zeta_m  =0$ constraint
+
+$\eta_n = \mu_{n\cdot} - \mu_{\cdot\cdot}$ = factor effect of WHO_region with $\sum_{n=1}^{6} \eta_n  =0$ constraint
+
+### Hypothesis
+
+<span style='color:black'>
+Because the is analysis is focused on testing the effects of five independent variables as well as their interaction on an outcome measure, it is important to state a hypothesis test. For the main effects, which are the effects of the different levels of a single independent variable, the null hypothesis ($H_o$) is that the means of the different levels of a given independent variable are not different from each other, while the alternative hypothesis ($H_a$) is that these groups are different from each other as follows. 
+
+$$H_o : \mu_1 =\mu_2 = \cdots = \mu_k = 0  \ \ \ vs. \ \ H_a: \ not  \ all \  \mu_i \ equals \ 0$$
+The decision rule for this hypothesis are defined as follows, where $F(1-\alpha;r−1,n_T - r)$ is the $(1-\alpha)100$ percentile of the appropriate F distribution.
+
+- If $F^* \le F(1-\alpha;r−1,n_T - r)$, then conclude  $H_o$.
+
+- If $F^* > F(1-\alpha;r−1,n_T - r)$, then conclude  $H_a$. 
+
+Choosing a significance level $\alpha=0.01$, it is evident that the Main Effect of each factor are all statistically significant based on the output of the two models specified below, where all the p-values are less than 2e-16 as shown in the summary output. The null hypothesis stated above can be rejected because of the strong evidence observed. It can also be concluded that there are significant differences in the impact of each factor on New_cases. It is important to note that this analysis is only focused on the effect of the different region and policies without considering the possible effects of the variable Country in the data. Since fitting the model with the variable Country is more complex and requires longer time to complete, choosing the variable _WHO_region_ as the between-subjects factor is more efficient. 
+</span>
+
+Summary output of the full additive ANOVA model without interactions:  
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+data_monthly2$WHO_region <- as.factor(data_monthly2$WHO_region)
+reduced_mod=aov(New_cases~Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region, data=data_monthly2)
+summary(reduced_mod)
+```
+<!-- Summary output of the full additive ANOVA model without locations and interactions:   -->
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+# reduced_mod=aov(New_cases~Country+Face_cover+Vaccination+Internal_movement+Stay_home+International_travel, data=data_monthly2)
+# summary(reduced_mod)
+```
+
+
+<span style='color:black'>
+The ANOVA table of the full additive ANOVA model without interactions is displayed below and shows that all of the factors are statistically significant at signficance level $\alpha=0.05$. The ges (Generalized Eta-Squared), which measures the effect size, also shows the the factors Face_cover, Vaccination, and WHO_region have the highest effect size out of all the 6 factors included in the model. 
+</span>
+
+ANOVA Table (Type II test) for full additive ANOVA model without interactions:
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+library(rstatix)
+res.aov <- anova_test(New_cases~Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region, data=data_monthly2)
+res.aov
+```
+
+<span style='color:black'>
+It can be further tested whether the interactions between the categorical predictors have a significant impact on the response variable New_cases. Based on the ANOVA table displayed below, the interaction between these factors appear to have a significant impact on the response with small p-values suggesting that there there is a strong evidence against the null hypothesis that the interactions between the predictors have no significant effect on the response. Additional tests can be performed in order to find the best combination of predictors for this case where their effect on the response is statistically significant. The summary output of the full ANOVA model shown below also shows that all 5 policy factors are statistically significant at significance level $\alpha$=0.01. By looking at this summary output, we can see that the interaction between all of the factors are equally statistically significant. Therefore, additional tests are not needed to identify which of the interactions are the best combinations. Based on these results, all of the interactions between the categorical predictors are statistically significant. Therefore the final anova model must be additive with all possible interactions. 
+</span>
+
+Summary output of the full ANOVA model with interactions:  
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+# Test for interactions 
+# library(gtsummary)
+full_mod=aov(New_cases~(Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region)^2,data=data_monthly2)
+summary(full_mod)
+# tbl_regression(full_mod)
+# sapply(data_monthly1, class)
+```
+
+
+
+ANOVA Table of full and reduced model comparison:  
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+reduced_mod=aov(New_cases~Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region, data=data_monthly2)
+anova(reduced_mod,full_mod)
+```
+
+```{r, include = FALSE, message=FALSE, warning=FALSE}
+
+#main effects plot for occupation
+# library(gplots)
+# plotmeans(New_cases~Face_cover,data= data_monthly2, xlab="Face_cover",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
+# 
+# plotmeans(New_cases~Vaccination,data= data_monthly2, xlab="Vaccination",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
+# 
+# plotmeans(New_cases~Internal_movement,data= data_monthly2, xlab="Internal movement",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
+# 
+# 
+# plotmeans(New_cases~Stay_home,data= data_monthly2, xlab="Stay home",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
+# 
+# plotmeans(New_cases~International_travel,data= data_monthly2, xlab="International travel",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
+
+```
+
+
+### Mean Pair-Wise Comparisons
+
+<span style='color:black'>
+In the previous section where _Figure 4_ is shown, it is observed that the means within each factor vary between different levels or groups. Tukey's HSD (honestly significant difference) is utilized to perform the pairwise comparison of means ($\mu_i -\mu_{i'}$). The coverage is exactly 1−$\alpha$ for this study it is at least 1−α because it is an unbalanced case.The following tables show the mean pairwise comparisons within each factor using the Tukey HSD method. The p-values in each table appears to be extremely small the pairwise differences are significant, which proves the observation obtained using _Figure 4_ in the previous section. 
+</span>
+
+
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+
+# ```{r, echo = FALSE, results='asis', message=FALSE, warning=FALSE}
+sig.level= 0.01
+T.cii=TukeyHSD(full_mod,conf.level = 1-sig.level)
+# par(mfrow=c(3,5))
+# plot(T.cii, las=1 , col="red")
+# title(main=print(paste0("95% family-wise confidence level")))
+# Differences of the two largest means
+idxx=list();
+idxx[[1]]=data_monthly2$Face_cover
+means.combb=tapply(data_monthly$New_cases, INDEX=idxx,mean)
+means.combb<-as.data.frame(means.combb)
+# library(ggiraphExtra)
+# library(gridExtra)
+# f1<-ggHSD(T.cii, no = 1, digits = 2, interactive = F)
+# f2<-ggHSD(T.cii, no = 2, digits = 2, interactive = FALSE)
+# grid.arrange(f1, f2, ncol =2)
+```
+
+```{r, echo = FALSE, results='asis', message=FALSE, warning=FALSE}
+# Find the confidence interval among the many comparisons...
+tcii1 <- T.cii[['Face_cover']]
+tcii2 <- T.cii[['Vaccination']]
+tcii3 <- T.cii[['Internal_movement']]
+tcii4 <- T.cii[['Stay_home']]
+tcii5 <- T.cii[['International_travel']]
+tcii6 <- T.cii[['WHO_region']]
+
+tcii<-rbind(tcii1,tcii2, tcii3, tcii4, tcii5, tcii6)
+
+datatable(tcii1, caption = htmltools::tags$caption(
+                  style = 'caption-side: bottom; text-align: center;',
+                  'Table 5: ', htmltools::em('Face Cover Pairwise Comparison on Covid-19 cases'), rownames = FALSE,filter="top", options = list(pageLength = 10, autoWidth = TRUE, scrollX=T, columnDefs = list(list(width = '50px', targets = "_all")))))
+
+datatable(tcii2, caption = htmltools::tags$caption(
+                  style = 'caption-side: bottom; text-align: center;',
+                  'Table 6: ', htmltools::em('Vaccination Pairwise Comparison on Covid-19 cases'), rownames = FALSE,filter="top", options = list(pageLength = 10, autoWidth = TRUE, scrollX=T, columnDefs = list(list(width = '50px', targets = "_all")))))
+
+datatable(tcii3, caption = htmltools::tags$caption(
+                  style = 'caption-side: bottom; text-align: center;',
+                  'Table 7: ', htmltools::em('Internal movement  Pairwise Comparison on Covid-19 cases'), rownames = FALSE,filter="top", options = list(pageLength = 10, autoWidth = TRUE, scrollX=T, columnDefs = list(list(width = '50px', targets = "_all")))))
+
+
+datatable(tcii4, caption = htmltools::tags$caption(
+                  style = 'caption-side: bottom; text-align: center;',
+                  'Table 8: ', htmltools::em('Stay at home Pairwise Comparison on Covid-19 cases'), rownames = FALSE,filter="top", options = list(pageLength = 10, autoWidth = TRUE, scrollX=T, columnDefs = list(list(width = '50px', targets = "_all")))))
+
+datatable(tcii5, caption = htmltools::tags$caption(
+                  style = 'caption-side: bottom; text-align: center;',
+                  'Table 9: ', htmltools::em('International travel Pairwise Comparison on Covid-19 cases'), rownames = FALSE,filter="top", options = list(pageLength = 10, autoWidth = TRUE, scrollX=T, columnDefs = list(list(width = '50px', targets = "_all")))))
+
+datatable(tcii6, caption = htmltools::tags$caption(
+                  style = 'caption-side: bottom; text-align: center;',
+                  'Table 10: ', htmltools::em('WHO Region Pairwise Comparison on Covid-19 cases'), rownames = FALSE,filter="top", options = list(pageLength = 10, autoWidth = TRUE, scrollX=T, columnDefs = list(list(width = '50px', targets = "_all")))))
+```
+
+
+***
+
+
+
+
+<!-- ### Mixed effect ANOVA model -->
+
+<!-- ```{r, echo = FALSE, message=FALSE, warning=FALSE} -->
+<!-- library(lme4) -->
+<!-- data_monthly2$Country <- as.factor(data_monthly2$Country) -->
+<!-- reduced_mod=lmer(New_cases~Face_cover+Vaccination+Internal_movement+Stay_home+International_travel + (1|Country), data=data_monthly2) -->
+<!-- summary(reduced_mod) -->
+<!-- ``` -->
+
+# **Sensitivity Analysis**
+
+<span style='color:black'>
+Each of the assumptions stated for the ANOVA model can be tested in order to verify if the chosen model is reliable or not. The following lsits the assumptions associated with the ANOVA model used for this analysis. 
+
+- The error terms are independent.
+
+- The error terms are normally distributed.
+
+- The data does not have any significant outliers.
+
+- The variance of the error terms are equal.
+
+- The variances of the sampled populations are equal.
+
+
+
+
+The _Normal Q-Q Plot_ shown below (Figure 10) can be used to determine if the residuals follow a normal distribution. Since all of the points are roughly along the diagonal dashed line, it can be inferred that the the error terms $\epsilon_{ijk\ell mn}$ follow a normal distribution without significant outliers. Furthermore, the _Residuals against Fitted values_  shows that the red line is horizontal, which suggests that the error terms $\epsilon_{ijk\ell mn}$ are independent. Based on the _Residuals vs Leverage_ plot below, it appears that there are no possible signficant outlier that needs to be removed from the data.  
+
+</span>
+
+```{r, echo = FALSE, fig.cap="Figure 10: Model Diagnostic Plots" , message=FALSE, warning=FALSE}
+par(mfrow=c(2,2))
+plot(full_mod,pch =20, cex = 2, col = "aquamarine2")
+```
+
+<span style='color:black'>
+
+The Levene test method is used to test the homogeneity of variance and generate the results shown below. The null hypothesis for the Levene test method states that the variances across each population are equal ($H_o: \sigma_{1}^{2} = \sigma_{2}^{2} = \ldots = \sigma_{a}^{2}$) and the alternative hypothesis is defined as $H_a: \sigma_{i}^{2} \ne \sigma_{j}^{2}$ for at least two populations. For this test, the $F$-statistic is computed for $H_0: \mathbb{E}[d_{1\cdot}]=\mathbb{E}[d_{2\cdot}] = \cdots =\mathbb{E}[d_{r\cdot}]$ and $H_0$ is rejected if $F^*>F(1-\alpha; r-1, n_T-r)$ at significance level $\alpha$.The Levene test is performed below by simply using the *leveneTest()* function.  The p-values for all factors are statistically significant, which declares there is non-homogeneity across their respective levels when tested to significance level $\alpha$=0.01. This confirms that the equal variance assumption stated for this model is violated. Therefore, further investigation is needed to assess the source of non-homogenous variance that we see in this result. However, for the model diagnostics portion of this report we use the results obtained using the diagnostics plot above.  
+
+</span>
+
+Face covering:
+```{r, echo = FALSE, , message=FALSE, warning=FALSE}
+library(car)
+leveneTest(New_cases~Face_cover,data_monthly2)
+```
+
+Vaccination:
+```{r, echo = FALSE, , message=FALSE, warning=FALSE}
+leveneTest(New_cases~Vaccination,data_monthly2)
+```
+
+Internal movement:
+```{r, echo = FALSE, , message=FALSE, warning=FALSE}
+leveneTest(New_cases~Internal_movement,data_monthly2)
+```
+
+Stay-at-home: 
+```{r, echo = FALSE, , message=FALSE, warning=FALSE}
+leveneTest(New_cases~Stay_home,data_monthly2)
+```
+
+International travel:
+```{r, echo = FALSE, , message=FALSE, warning=FALSE}
+leveneTest(New_cases~International_travel,data_monthly2)
+```
+
+WHO region:
+```{r, echo = FALSE, , message=FALSE, warning=FALSE}
+leveneTest(New_cases~WHO_region,data_monthly2)
+```
+
+<span style='color:black'>
+The table below shows the different possible outliers in this data. However, in the diagnostics plot above wecan see that they do not have significant effect on the model assumptions so they can be retained. 
+</span>
+
+```{r, echo = FALSE , message=FALSE, warning=FALSE}
+#outlier
+p<-data_monthly1 %>%
+  group_by(WHO_region, Face_cover, Vaccination, Internal_movement, International_travel, Stay_home) %>%
+  identify_outliers(New_cases)
+datatable(p, caption = htmltools::tags$caption(
+                  style = 'caption-side: bottom; text-align: center;',
+                  'Table 11: ', htmltools::em('Outliers'), rownames = FALSE,filter="top", options = list(pageLength = 5, autoWidth = TRUE, scrollX=T, columnDefs = list(list(width = '50px', targets = "_all")))))
+
+```
+
+***
+
+# **Discussion**
+
+
+<span style='color:black'>
+The primary objective of this analysis is to identify whether public health policies have a significant impact on the number of positive Covid-19 cases using data obtained from various sources. Using the Analysis of variance (ANOVA) method to assess the effect of public health policies on Covid-19 cases across different regions, we can conclude that all the public health policies have significant association with the number of positive cases in different regions around the world. To answer the secondary question of interest stated in the introduction section, face covering and vaccination policies have the highest effect size out of all the 6 factors included in the model while stay-at-home order has the least effect size. It important to clarify that these identified association between the number of positive Covid-19 cases and the significant factors may be a classified as an indirect association due to the fact that successful transmission of the Covid-19 virus may depend on other factors that are excluded from this analysis that can be used to define the significant relationships observed. Further investigations maybe necessary in order to verify the results obtained from the methods used in this analysis. The relationships between the variables in the data used for this project can be explored using other methods such as Mixed Effect ANOVA with multiple factors using Country as the random factor and holding the policy factors fixed. The results of using Fixed-effect ANOVA suggests that all public health policies and their interactions have significant effect on the number of positive Covid-19 cases across different regions worldwide. This may be the reason why the current number of positive cases is generally declining however, there were times during the pandemic when these factors were not effective due the increase in positive cases recorded. Therefore, we should not only consider these factors when determining the possible causes of increased virus transmission if if they are extremely helpful. The presence of other factor might play an important role and override the effects of the public health policies. Overall, government interventions are necessary during a pandemic as we see in these results. 
+</span>
+
+
+***
+
+# **Acknowledgement**
+
+<span style='color:black'>
+
+https://statisticsglobe.com/aggregate-daily-data-to-month-year-intervals-in-r
+
+https://www.r-bloggers.com/2018/01/bitcoin-world-map-bubbles/
+
+https://www.machinelearningplus.com/machine-learning/feature-selection/
+
+https://github.com/bbc/bbplot
+
+https://rawgit.com/valentinitnelav/valentinitnelav.github.io/master/assets/2018-08-25-PCA-interactive-biplot/PCA-interactive-biplot.html
+
+https://rpubs.com/Saskia/520216 
+
+http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/114-mca-multiple-correspondence-analysis-in-r-essentials/
+
+https://machinelearningmastery.com/feature-selection-with-categorical-data/
+
+https://services.google.com/fh/files/misc/exploratory_data_analysis_for_feature_selection_in_machine_learning.pdf
+
+Data Sources: 
+
+[Covid-19](https://github.com/ChenShizhe/Covid-19-course-project/tree/main/Data)
+
+[Other](https://ourworldindata.org/coronavirus)
+
+</span>
+
+***
+
+# **Reference**
+
+https://bmcpublichealth.biomedcentral.com/articles/10.1186/s12889-021-11111-1#
+
+https://www.cdc.gov/mmwr/volumes/71/wr/mm7106e1.htm
+
+https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0248849#
+
+https://bmcpublichealth.biomedcentral.com/articles/10.1186/s12889-021-11889-0
+
+# **Appendix**
+
+[Github Repository](https://github.com/kayannr/covid-19)
+
+
+***
+
+## Session information {-}
+```{r}
+sessionInfo()
+```
+

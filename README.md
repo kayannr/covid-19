@@ -10,6 +10,4 @@ This project aims to assess the effectiveness of Covid-19 Policies using Analysi
 
 - Sentivity Analysis 
 
-The final report is provided in the link attached below. 
-
-https://rpubs.com/kroyo/cov19-a
+[Final report](https://rpubs.com/kroyo/cov19-a)

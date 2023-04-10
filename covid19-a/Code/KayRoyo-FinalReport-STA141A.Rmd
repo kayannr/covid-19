@@ -1,6 +1,6 @@
 ---
-title: "Covid-19 Analysis: Assessment of Covid-19 Policies Effectiveness"
-author: "Kay Royo (920227691)"
+title: "Covid-19 Analysis: Effectiveness of Covid-19 Policies"
+author: "Kay Royo"
 date: "3/13/22"
 output: 
   rmdformats::readthedown:
@@ -50,9 +50,7 @@ Primary Question of Interest:
 
 - Are public health policies useful in determining the number of positive Covid-19 cases?
 
-Secondary Questions of Interest: 
-
-- How effective are public health policies?
+Secondary Question of Interest: 
   
 - Which of these public health policies are most and least effective?
 
@@ -79,8 +77,6 @@ This project explores the data collected from two sources in order to answer the
 The data used for this analysis was collected from various sources mentioned in the `Acknowledgement` section of this report.The supplementary data sets were collected from OWID, which contain the features that are useful for answering the primary and secondary questions of interest. The final aggregated data displayed in Table 3 below specifically used for this analysis project are aggregated by month for a total of 180 countries from 2020 to 2022. This data set contains variables that are  defined in the tables attached below (Tables 1 and 2). The maximum policy level for each month is retained and used for this analysis since policy levels do not change daily. Simplifying the data by aggregating it into a monthly record also contributes to the efficiency when analyzing this data to answer the questions of interest. A lagged variable for total number of Covid-19 cases per month is also generated in order to consider the fact that changes in policies implemented during a specific time may not yield any significant results immediately. 
 </span>
 
-```{r, include=F, message=FALSE, warning=FALSE}
-```
 
 Table 1: Variable Definitions
 ```{r table2, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
@@ -123,7 +119,7 @@ table2%>%kable()
 
 ```{r, include=F, message=FALSE, warning=FALSE}
 #load WHO data
-who_data <-read.csv("C:/Users/kayan/R-Projects/STA141A/141Final-Project/Data/covid/WHO-COVID-19-global-data.csv")
+who_data <-read.csv("C:/Users/kayan/UCD/STA141A/covid-19/covid19-a/Data/covid/WHO-COVID-19-global-data.csv")
 who_data <- as.data.frame(who_data)
 colnames(who_data)[1] <- "Date" 
 who_data <- subset(who_data, select = -c(Country_code,New_deaths, Cumulative_deaths))
@@ -141,7 +137,7 @@ who_data <- subset(who_data[, c(1,8,6,7,2,3,4,5)])
 
 ```{r, include=F,results='asis', message=FALSE, warning=FALSE}
 #load face covering data
-face_data <-read.csv("C:/Users/kayan/R-Projects/STA141A/141Final-Project/Data/policies/face-covering-policies-covid.csv", header=T)
+face_data <-read.csv("C:/Users/kayan/UCD/STA141A/covid-19/covid19-a/Data/policies/face-covering-policies-covid.csv", header=T)
 face_data <- as.data.frame(face_data)
 colnames(face_data)[1] <- "Country"
 colnames(face_data)[3] <- "Date"
@@ -153,7 +149,7 @@ sapply(face_data, class)
 
 ```{r, include=F,results='asis', message=FALSE, warning=FALSE}
 #load vaccination policy data
-vacc_data <-read.csv("C:/Users/kayan/R-Projects/STA141A/141Final-Project/Data/policies/covid-vaccination-policy.csv", header=T)
+vacc_data <-read.csv("C:/Users/kayan/UCD/STA141A/covid-19/covid19-a/Data/policies/covid-vaccination-policy.csv", header=T)
 vacc_data <- as.data.frame(vacc_data)
 colnames(vacc_data)[1] <- "Country"
 colnames(vacc_data)[3] <- "Date"
@@ -165,7 +161,7 @@ sapply(vacc_data, class)
 
 ```{r, include=FALSE,results='asis', message=FALSE, warning=FALSE}
 #load internal movement policy data
-internal_data <-read.csv("C:/Users/kayan/R-Projects/STA141A/141Final-Project/Data/policies/internal-movement-covid.csv", header=T)
+internal_data <-read.csv("C:/Users/kayan/UCD/STA141A/covid-19/covid19-a/Data/policies/internal-movement-covid.csv", header=T)
 internal_data <- as.data.frame(internal_data)
 colnames(internal_data)[1] <- "Country"
 colnames(internal_data)[3] <- "Date"
@@ -177,7 +173,7 @@ sapply(internal_data, class)
 
 ```{r, include=FALSE,results='asis', message=FALSE, warning=FALSE}
 #load stay at home restrictions data
-stayhome_data <-read.csv("C:/Users/kayan/R-Projects/STA141A/141Final-Project/Data/policies/stay-at-home-covid.csv", header=T)
+stayhome_data <-read.csv("C:/Users/kayan/UCD/STA141A/covid-19/covid19-a/Data/policies/stay-at-home-covid.csv", header=T)
 stayhome_data <- as.data.frame(stayhome_data)
 colnames(stayhome_data)[1] <- "Country"
 colnames(stayhome_data)[3] <- "Date"
@@ -189,7 +185,7 @@ sapply(stayhome_data, class)
 
 ```{r, include=FALSE,results='asis', message=FALSE, warning=FALSE}
 #load international travel restrictions data
-inttravel_data <-read.csv("C:/Users/kayan/R-Projects/STA141A/141Final-Project/Data/policies/international-travel-covid.csv", header=T)
+inttravel_data <-read.csv("C:/Users/kayan/UCD/STA141A/covid-19/covid19-a/Data/policies/international-travel-covid.csv", header=T)
 inttravel_data <- as.data.frame(inttravel_data)
 colnames(inttravel_data)[1] <- "Country"
 colnames(inttravel_data)[3] <- "Date"
@@ -505,7 +501,7 @@ list(size = 12)))
 
 
 <span style='color:black'>
-The histogram below shows the frequency of the different regions and levels of policies and restrictions using the data aggregated by year and month (Table 3). The histogram shows that the region and policy factors are roughly normally distributed. It also shows the these factors have unequal number of levels, which results in an imbalanced model design.  
+The histogram below shows the frequency of the different regions and levels of policies and restrictions using the data aggregated by year and month (Table 3). The histograms show the these factors have unequal number of levels, which results in an imbalanced model design.  
 </span>
 
 ```{r, echo = FALSE,  fig.width=10,fig.height=6, fig.cap= "Figure 3: Histogram of Categorical Region and Policy Variables ",fig.align='left', message=FALSE, warning=FALSE}
@@ -624,14 +620,7 @@ subplot(f0, f2, f3,f1 ,f4,f5, shareY = T, nrows = 1,heights =1, margin=0.005)%>%
 ```
 
 
-<span style='color:black'>
-The attached figure below (Figure 4) shows the boxplot of total monthly Covid-19 cases in the data (Table 3) under different regions and policy factors. Since the means (red dots) within each plot does not follow a horizontal trend, this means that the regions and policies shown have an impact on the number of cases.  The means of the number of cases vary across all factor levels within region and each policy variable.  The boxplot of _Lag_cases_ does not differ significantly from the boxplot using _New_cases_. Therefore, it is not necessary to use _Lag_cases_ for this project.   
-</span>
-
-```{r echo=FALSE, fig.align='left', fig.cap="Figure 4: Boxplot of Covid-19 and Policies ", fig.height=6, fig.width=10, message=FALSE, warning=FALSE}
-
-
-```
+The attached figure below (Figure 4) shows the boxplot of total monthly Covid-19 cases in the data (Table 3) under different regions and policy factors. Since the means (red dots) within each plot does not follow a horizontal trend, this suggests that the regions and policies shown have an impact on the number of cases. The means of the number of cases vary across all factor levels within region and each policy variable. The boxplot of Lag_cases does not differ significantly from the boxplot using New_cases. Therefore, it is not necessary to use Lag_cases in this case. 
 
 ```{r echo=FALSE, fig.align='left', fig.cap="Figure 4: Boxplot of Covid-19 and Policies ", fig.height=6, fig.width=10, message=FALSE, warning=FALSE}
 
@@ -869,7 +858,7 @@ In order to further explore the data used for this analysis, the following metho
 
 ## Multiple correspondence analysis (MCA)
 
-The goal in this section is to identify any possible similarities between categorical predictors in the data that are used in the data modelling section. In order to perform this task, a method that is specifically used for summarizing and visualizing data that contains more than one categorical variables is used. The _multiple correspondence analysis_ (MCA) method is similar to _principal component analysis_ (PCA) but more useful when the data is categorical. Using this method, the significant variables that contribute the most in explaining the variations in the data can also be identified. In order to improve process efficiency, the data used in this section is an aggregated yearly data where the number of cumulative cases for each country every year are aggregated as total number of cases from 2020 to 2022 and the maximum policy imposed are retained. In terms of MCA, the categorical region and policies are used as the _active variables_, which are the variables that are passed into the MCA() function. The different countries are the _active individuals_, which represent the observations or rows included in the MCA. The number of Covid-19 cases are used as the _supplementary variable_, which are not included in the MCA but their coordinates can be predicted by the MCA using the _active variables_ and _active individuals_. The histogram of the active variables (policies) in Figure 3 in the previous section does not show any categories with extremely small frequency. The lowest predictor level frequency is equal to 138, which is from vaccination with level 1. This value should be large enough to not cause any distortion in MCA.  
+The goal in this section is to identify any possible similarities between categorical predictors in the data that are used in the data modelling section. In order to perform this task, a method that is specifically used for summarizing and visualizing data that contains more than one categorical variables is used. The _multiple correspondence analysis_ (MCA) method is similar to _principal component analysis_ (PCA) but more useful when the data is categorical. Using this method, the significant variables that contribute the most in explaining the variations in the data can also be identified and the insignificant variables can be eliminated to avoid overfitting. In order to improve process efficiency, the data used in this section is an aggregated yearly data where the number of cumulative cases for each country every year are aggregated as total number of cases from 2020 to 2022 and the maximum policies imposed given the specified period are retained. In terms of MCA, the categorical region and policies are used as the _active variables_, which are the variables that are passed into the MCA() function. The different countries are the _active individuals_, which represent the observations or rows included in the MCA. The number of Covid-19 cases are used as the _supplementary variable_, which are not included in the MCA but their coordinates can be predicted by the MCA using the _active variables_ and _active individuals_. The histogram of the active variables (policies) in Figure 3 in the previous section does not show any categories with extremely small frequency. The lowest predictor level frequency is equal to 138, which is from vaccination with level 1. This value should be large enough to not cause any distortion in MCA.  
 
 
 
@@ -889,7 +878,7 @@ mca <- MCA(active, graph = FALSE)
 ```
 
 
-To visualize the proportion of variances explained by each MCA dimension, the function _fviz_screeplot()_ is used and the generated Scree plot is shown in Figure 5 below. This Scree plot can be interpreted in a similar way as the PCA Scree plots for principal components. The scree plot below does not appear to have any significant drop or "elbow". Therefore, it can be inferred that there are no dominating directions that exist in the data. 
+To visualize the proportion of variances explained by each MCA dimension, the function _fviz_screeplot()_ is used to generate the Scree plot shown in Figure 5 below. This Scree plot can be interpreted in a similar way as the PCA Scree plots for principal components. The scree plot below does not appear to have any significant drop or "elbow". Therefore, it can be inferred that there are no dominating directions that exist in the data. Hence, all the dimensions can be retained for this analysis. 
 
 ```{r, echo= FALSE, fig.cap = "Figure 5: MCA Scree plot", fig.align = 'left', message=FALSE, warning=FALSE}
 # Eigenvalues / Variances
@@ -954,7 +943,7 @@ fviz_mca_var(mca, choice = "mca.cor",
 
 
 
-<!-- ## Categorical Feature Selection  -->
+<!-- ## Preliminary Feature Selection -->
 
 <!-- Determine which features/policies are the most important using different methods   -->
 
@@ -1043,6 +1032,7 @@ fviz_mca_var(mca, choice = "mca.cor",
 # shortlistedVars <- shortlistedVars[!shortlistedVars %in% "(Intercept)"]  # remove intercept 
 # print(shortlistedVars)
 ```
+
 <!-- ### Step wise Forward and Backward Selection -->
 
 ```{r, include = FALSE, message=FALSE, warning=FALSE}
@@ -1080,22 +1070,33 @@ Since the variables included in the data are categorical and the questions of in
 ## Variable Transformation 
 
 <span style='color:black'> 
-For this analysis, it can be tested whether _New_cases_ can be transformed in order to remove its heavy right-skewed distribution. This variable is used as the response for the ANOVA model in the following section. Therefore, it is crucial to determine if this variable violates the normality assumption or not.  Although the residual follow a constant variance, we can see from the normal Q-Q plot below (Figure 8) that the residuals are heavily right-tailed. The log transformation plot below (Figure 9) shows that the distribution of the _New_cases_ variable is normally distributed after performing the log transformation. Thus, the ANOVA model can be fitted using the log of _New_cases_. 
+For this analysis, it can be tested whether _New_cases_ can be transformed in order to remove its heavy right-skewed distribution. This variable is used as the response for the ANOVA model in the following section. Therefore, it is crucial to determine if this variable violates the normality assumption or not.  Figure 8 below shows the diagnostic plot for the full model. Although the residual follow a constant variance, we can see from the normal Q-Q plot that the residuals are heavily right-tailed suggesting that variable transformation is needed. 
 </span>
 
 ```{r, echo = FALSE,  fig.align = 'left', fig.cap = 'Figure 8: Diagnostic Plot',message=FALSE, warning=FALSE}
 ##Box-cox transformation
 d<- data_monthly1[-1,c(3,7:12)]
 fit1<-aov(New_cases~., data=d) #first-order model with the (non-transformed) variables
+#summary(fit1)
 par(mfrow=c(2,2))
 plot(fit1,pch =20, cex = 2, col = "cornflowerblue")
-# summary(fit1)
-# ###The Box-Cox likelihood suggests a power transformation with power -0.02.
-# bc<-MASS::boxcox(fit1, lambda = seq(-4, 4, by = 0.01),plotit = T)
+```
+
+
+<span style='color:black'>
+Since the monthly dataset contains various observations where the variable _New_cases_ is zero, these observations can be excluded in order to avoid encountering issues when using log transformation. Figure 9 below shows that the relative frequency of 0 new cases in the monthly data is dominant. The histogram of the log of _New_cases_ below in Figure 9 shows that the distribution of the variable _New_cases_ is normally distributed after performing the log transformation. Thus, the ANOVA model can be fitted using the log of _New_cases_ with nonzero values. After the removal of rows with 0 new cases recorded, the total number of observations in the new  simplified dataset decreased from 4641 to 4164, which is not a significant difference. 
+</span>
+
+```{r, echo = FALSE,  fig.align = 'left', fig.cap = 'Figure 9: Distribution of New_cases',message=FALSE, warning=FALSE}
 data_monthly2 <- data_monthly1
 data_monthly2$New_cases <- log(data_monthly2$New_cases)
 data_monthly2$New_cases[which(!is.finite(data_monthly2$New_cases))] <- 0 #replace inf val with 0 for log(0) = inf
+data_monthly2_f<- subset(data_monthly2, New_cases != 0) #exclude 0s \
+# print(nrow(data_monthly1))
+# print(nrow(data_monthly2))
+# print(nrow(data_monthly2_f))
 ```
+
 
 
 ```{r, echo = FALSE,  fig.align = 'left', fig.cap = ' Figure 9: Log transformation of response variable', message=FALSE, warning=FALSE}
@@ -1103,25 +1104,44 @@ library(ggplot2)
 library(plotly)
 f2 <- ggplot(data_monthly1, aes(x = New_cases)) + xlab("Histogram of New_cases") +
     geom_histogram(aes(y = ..density..),bins = 30, fill = "#69b3a2", color = "white",alpha=0.8) +
-                stat_function(fun = dnorm,
-                args = list(mean = mean(data_monthly1$New_cases),
-                            sd = sd(data_monthly1$New_cases)),
-                col = "grey40",
-                size = 0.5)+labs(x="Histogram of New_cases")
+                # stat_function(fun = dnorm,
+                # args = list(mean = mean(data_monthly1$New_cases),
+                #             sd = sd(data_monthly1$New_cases)),
+                # col = "grey40",
+                # size = 0.5)+
+                labs(x="Histogram of New_cases")
 
-f4 <- ggplot(data_monthly1, aes(x = log(data_monthly1$New_cases))) +
+f4 <- ggplot(data_monthly2_f, aes(x = data_monthly2_f$New_cases)) +
     geom_histogram(aes(y = ..density..),bins = 30, fill = "#69b3a2", color = "white",alpha=0.8) +
-                stat_function(fun = dnorm,
-                args = list(mean = mean(log(data_monthly1$New_cases)),
-                            sd = sd(log(data_monthly1$New_cases))),
-                col = "grey40",
-                size = 1)+labs(x="Histogram of log(New_cases)")
+                # stat_function(fun = dnorm,
+                # args = list(mean = mean(data_monthly2_f$New_cases),
+                #             sd = sd(data_monthly2_f$New_cases)),
+                # col = "grey40",
+                # size = 1)+
+                labs(x="Histogram of log(New_cases)")
 
 plotly::subplot(f2, f4, nrows=1, shareX=F, shareY=F, margin =0.02,titleX = TRUE)%>% layout(title ="Log Transformation", titlefont = list(
            family = "Agency FB",
            size = 26,
            color = 'black') , font = list(family = "Agency FB", size = 18),margin = 0.1, yaxis = list(
         color = 'black'))
+```
+
+<span style='color:black'>
+The full model fitted with the monthly dataset excluding observations where _New_cases_ is 0 and the log of _New_cases_ as the response variable does not severely violate the ANOVA model assumptions as shown in its diagnostic plot below (Figure 10). Additionally, The Box-Cox plot in Figure 11 shows that fitting the full model with log of _New_cases_ as the response does not need any further transformation since $\lambda$ is approximately 1. 
+</span>
+
+```{r, echo = FALSE,  fig.align = 'left', fig.cap = 'Figure 10: Box-Cox Plot',message=FALSE, warning=FALSE}
+d<- data_monthly2_f[-1,c(3,7:12)]
+fit2<-aov(New_cases~., data=d)
+#summary(fit1)
+par(mfrow=c(2,2))
+plot(fit2,pch =20, cex = 2, col = "cornflowerblue")
+```
+
+```{r, echo = FALSE,  fig.align = 'left', fig.cap = 'Figure 11: Box-Cox Plot',message=FALSE, warning=FALSE}
+# Box-cox
+bc<-MASS::boxcox(fit2)
 ```
 
 
@@ -1184,8 +1204,8 @@ Choosing a significance level $\alpha=0.01$, it is evident that the Main Effect 
 
 Summary output of the full additive ANOVA model without interactions:  
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
-data_monthly2$WHO_region <- as.factor(data_monthly2$WHO_region)
-reduced_mod=aov(New_cases~Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region, data=data_monthly2)
+data_monthly2_f$WHO_region <- as.factor(data_monthly2_f$WHO_region)
+reduced_mod=aov(New_cases~Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region, data=data_monthly2_f)
 summary(reduced_mod)
 ```
 <!-- Summary output of the full additive ANOVA model without locations and interactions:   -->
@@ -1196,61 +1216,88 @@ summary(reduced_mod)
 
 
 <span style='color:black'>
-The ANOVA table of the full additive ANOVA model without interactions is displayed below and shows that all of the factors are statistically significant at signficance level $\alpha=0.05$. The ges (Generalized Eta-Squared), which measures the effect size, also shows the the factors Face_cover, Vaccination, and WHO_region have the highest effect size out of all the 6 factors included in the model. 
+The ANOVA table of the full additive ANOVA model without interactions is displayed below and shows that all of the factors are statistically significant at significance level $\alpha=0.05$. The `ges` (Generalized Eta-Squared), which measures the effect size, also shows the the factors Face_cover, Vaccination, and WHO_region have the highest effect size out of all the 6 factors included in the model. 
 </span>
 
 ANOVA Table (Type II test) for full additive ANOVA model without interactions:
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
 library(rstatix)
-res.aov <- anova_test(New_cases~Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region, data=data_monthly2)
+res.aov <- anova_test(New_cases~Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region, data=data_monthly2_f)
 res.aov
 ```
 
 <span style='color:black'>
-It can be further tested whether the interactions between the categorical predictors have a significant impact on the response variable New_cases. Based on the ANOVA table displayed below, the interaction between these factors appear to have a significant impact on the response with small p-values suggesting that there there is a strong evidence against the null hypothesis that the interactions between the predictors have no significant effect on the response. Additional tests can be performed in order to find the best combination of predictors for this case where their effect on the response is statistically significant. The summary output of the full ANOVA model shown below also shows that all 5 policy factors are statistically significant at significance level $\alpha$=0.01. By looking at this summary output, we can see that the interaction between all of the factors are equally statistically significant. Therefore, additional tests are not needed to identify which of the interactions are the best combinations. Based on these results, all of the interactions between the categorical predictors are statistically significant. Therefore the final anova model must be additive with all possible interactions. 
+It can be further tested whether the interactions between the categorical predictors have a significant impact on the response variable _New_cases_. Based on the ANOVA table displayed below, the interaction between most of these factors appear to have a significant impact on the response with small p-values suggesting that there there is a strong evidence against the null hypothesis that the interactions between the predictors have no significant effect on the response. Additional tests can be performed in order to find the best combination of predictors for this case where their effect on the response is statistically significant. The summary output of the full ANOVA model shown below also shows that all 5 policy factors are statistically significant at significance level $\alpha$=0.001. By looking at this summary output, we can see that the interaction between most of the factors are statistically significant with the exception of the interaction between _Stay_home_ and _International_travel_. Therefore, additional tests are not needed to identify which of the interactions are the best combinations. Based on these results, most of the interactions between the categorical predictors are statistically significant. Therefore the final anova model must be additive with most of the possible interactions. 
 </span>
 
 Summary output of the full ANOVA model with interactions:  
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
 # Test for interactions 
 # library(gtsummary)
-full_mod=aov(New_cases~(Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region)^2,data=data_monthly2)
+full_mod=aov(New_cases~(Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region)^2,data=data_monthly2_f)
 summary(full_mod)
 # tbl_regression(full_mod)
 # sapply(data_monthly1, class)
 ```
 
-
+<span style='color:black'>
+To compare the variation explained by two models: a full model that is additive with significant interactions and a reduced model that is only additive, the ANOVA table can be used. The table below shows that the full model provides a better fit to the data than the reduced model
+</span>
 
 ANOVA Table of full and reduced model comparison:  
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
-reduced_mod=aov(New_cases~Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region, data=data_monthly2)
+# full model with significant interactions 
+full_mod=aov(New_cases~Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region+Face_cover:Vaccination+Face_cover:Internal_movement+Face_cover:Stay_home+Face_cover:International_travel+Face_cover:WHO_region +Vaccination:Internal_movement+Vaccination:Stay_home+Vaccination:International_travel+Vaccination:WHO_region+Internal_movement:Stay_home+Internal_movement:International_travel+Internal_movement:WHO_region + Stay_home:WHO_region +International_travel:WHO_region , data=data_monthly2_f)
+
+# reduced model - additive
+reduced_mod=aov(New_cases~Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region, data=data_monthly2_f)
+
 anova(reduced_mod,full_mod)
 ```
+<span style='color:black'>
+The ANOVA table of the full additive ANOVA model with significant interactions is displayed below and shows that all of the factors and some of their interactions are statistically significant at significance level $\alpha=0.05$, which means that they have a significant effect on the number of covid-19 cases recorded. Based on the effect size (`ges`), the factors _Face_cover_, _Vaccination_, and _WHO_region_ continue to show the highest effect size out of all the 6 factors included in this model. Meanwhile, the interactions with the largest effect size are  _International_travel:WHO_region_, _Face_cover:WHO_region_, and _Vaccination:WHO_region_. It is evident that the interaction between the 5 policies and the region tend to have large effect size. 
+</span>
 
-```{r, include = FALSE, message=FALSE, warning=FALSE}
-
-#main effects plot for occupation
-# library(gplots)
-# plotmeans(New_cases~Face_cover,data= data_monthly2, xlab="Face_cover",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
-# 
-# plotmeans(New_cases~Vaccination,data= data_monthly2, xlab="Vaccination",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
-# 
-# plotmeans(New_cases~Internal_movement,data= data_monthly2, xlab="Internal movement",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
-# 
-# 
-# plotmeans(New_cases~Stay_home,data= data_monthly2, xlab="Stay home",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
-# 
-# plotmeans(New_cases~International_travel,data= data_monthly2, xlab="International travel",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
-
+ANOVA Table (Type II test) for full additive ANOVA model with significant interactions:
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+library(rstatix)
+res.aov <- anova_test(New_cases~Face_cover+Vaccination+Internal_movement+Stay_home+International_travel+WHO_region+Face_cover:Vaccination+Face_cover:Internal_movement+Face_cover:Stay_home+Face_cover:International_travel+Face_cover:WHO_region +Vaccination:Internal_movement+Vaccination:Stay_home+Vaccination:International_travel+Vaccination:WHO_region+Internal_movement:Stay_home+Internal_movement:International_travel+Internal_movement:WHO_region + Stay_home:WHO_region +International_travel:WHO_region, data=data_monthly2_f)
+res.aov
 ```
-
 
 ### Mean Pair-Wise Comparisons
 
 <span style='color:black'>
-In the previous section where _Figure 4_ is shown, it is observed that the means within each factor vary between different levels or groups. Tukey's HSD (honestly significant difference) is utilized to perform the pairwise comparison of means ($\mu_i -\mu_{i'}$). The coverage is exactly 1−$\alpha$ for this study it is at least 1−α because it is an unbalanced case.The following tables show the mean pairwise comparisons within each factor using the Tukey HSD method. The p-values in each table appears to be extremely small the pairwise differences are significant, which proves the observation obtained using _Figure 4_ in the previous section. 
+In _Figure 12_ below, it is evident that the means within each factor vary between different levels or groups. Tukey's HSD (honestly significant difference) is utilized to perform the pairwise comparison of means ($\mu_i -\mu_{i'}$). The coverage is exactly 1−$\alpha$ for this study it is at least 1−α because it is an unbalanced case.The following tables show the mean pairwise comparisons within each factor using the Tukey HSD method. The p-values in each table appears to be extremely small the pairwise differences are significant, which proves the observation obtained using _Figure 12_ in the previous section. 
 </span>
+
+```{r, echo= FALSE,  fig.align = 'left', fig.cap = 'Figure 12: Main Effect Plot (95% Confidence Interval)',  message=FALSE, warning=FALSE}
+
+#main effects plot for occupation
+library(gplots)
+library(gridExtra)
+
+par(mfrow=c(2,3))
+
+p0 <- plotmeans(New_cases~WHO_region,data= data_monthly2_f, xlab="WHO_region",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
+grid()
+
+p1 <- plotmeans(New_cases~Face_cover,data= data_monthly2_f, xlab="Face_cover",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
+grid()
+# 
+p2 <- plotmeans(New_cases~Vaccination,data= data_monthly2, xlab="Vaccination",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
+grid()
+# 
+p3 <- plotmeans(New_cases~Internal_movement,data= data_monthly2, xlab="Internal movement",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
+grid()
+# 
+# 
+p4 <- plotmeans(New_cases~Stay_home,data= data_monthly2, xlab="Stay home",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
+grid()
+# 
+p5 <- plotmeans(New_cases~International_travel,data= data_monthly2, xlab="International travel",ylab="Covid-19 cases", p=.95, main="Main effect Plot with 95% CI",cex=2, pch=20, barwidth=2, barcol="blue",  bars=TRUE, ccol="red", col="red")
+grid()
+```
 
 
 ```{r, echo = FALSE, message=FALSE, warning=FALSE}
@@ -1263,8 +1310,8 @@ T.cii=TukeyHSD(full_mod,conf.level = 1-sig.level)
 # title(main=print(paste0("95% family-wise confidence level")))
 # Differences of the two largest means
 idxx=list();
-idxx[[1]]=data_monthly2$Face_cover
-means.combb=tapply(data_monthly$New_cases, INDEX=idxx,mean)
+idxx[[1]]=data_monthly2_f$Face_cover
+means.combb=tapply(data_monthly2_f$New_cases, INDEX=idxx,mean)
 means.combb<-as.data.frame(means.combb)
 # library(ggiraphExtra)
 # library(gridExtra)
@@ -1343,11 +1390,11 @@ Each of the assumptions stated for the ANOVA model can be tested in order to ver
 
 
 
-The _Normal Q-Q Plot_ shown below (Figure 10) can be used to determine if the residuals follow a normal distribution. Since all of the points are roughly along the diagonal dashed line, it can be inferred that the the error terms $\epsilon_{ijk\ell mn}$ follow a normal distribution without significant outliers. Furthermore, the _Residuals against Fitted values_  shows that the red line is horizontal, which suggests that the error terms $\epsilon_{ijk\ell mn}$ are independent. Based on the _Residuals vs Leverage_ plot below, it appears that there are no possible signficant outlier that needs to be removed from the data.  
+The _Normal Q-Q Plot_ shown below (Figure 13) can be used to determine if the residuals follow a normal distribution. Since all of the points are roughly along the diagonal dashed line, it can be inferred that the the error terms $\epsilon_{ijk\ell mn}$ follow a normal distribution without significant outliers. Furthermore, the _Residuals against Fitted values_  shows that the red line is horizontal, which suggests that the error terms $\epsilon_{ijk\ell mn}$ are independent. Based on the _Residuals vs Leverage_ plot below, it appears that there are no possible significant outliers that needs to be removed from the data.  
 
 </span>
 
-```{r, echo = FALSE, fig.cap="Figure 10: Model Diagnostic Plots" , message=FALSE, warning=FALSE}
+```{r, echo = FALSE, fig.cap="Figure 13: Model Diagnostic Plots" , message=FALSE, warning=FALSE}
 par(mfrow=c(2,2))
 plot(full_mod,pch =20, cex = 2, col = "aquamarine2")
 ```
@@ -1361,41 +1408,41 @@ The Levene test method is used to test the homogeneity of variance and generate 
 Face covering:
 ```{r, echo = FALSE, , message=FALSE, warning=FALSE}
 library(car)
-leveneTest(New_cases~Face_cover,data_monthly2)
+leveneTest(New_cases~Face_cover,data_monthly2_f)
 ```
 
 Vaccination:
 ```{r, echo = FALSE, , message=FALSE, warning=FALSE}
-leveneTest(New_cases~Vaccination,data_monthly2)
+leveneTest(New_cases~Vaccination,data_monthly2_f)
 ```
 
 Internal movement:
 ```{r, echo = FALSE, , message=FALSE, warning=FALSE}
-leveneTest(New_cases~Internal_movement,data_monthly2)
+leveneTest(New_cases~Internal_movement,data_monthly2_f)
 ```
 
 Stay-at-home: 
 ```{r, echo = FALSE, , message=FALSE, warning=FALSE}
-leveneTest(New_cases~Stay_home,data_monthly2)
+leveneTest(New_cases~Stay_home,data_monthly2_f)
 ```
 
 International travel:
 ```{r, echo = FALSE, , message=FALSE, warning=FALSE}
-leveneTest(New_cases~International_travel,data_monthly2)
+leveneTest(New_cases~International_travel,data_monthly2_f)
 ```
 
 WHO region:
 ```{r, echo = FALSE, , message=FALSE, warning=FALSE}
-leveneTest(New_cases~WHO_region,data_monthly2)
+leveneTest(New_cases~WHO_region,data_monthly2_f)
 ```
 
 <span style='color:black'>
-The table below shows the different possible outliers in this data. However, in the diagnostics plot above wecan see that they do not have significant effect on the model assumptions so they can be retained. 
+The table below shows the different possible outliers in this data. However, the diagnostics plot above show that they do not have significant effects on the model assumptions so they can be retained. 
 </span>
 
 ```{r, echo = FALSE , message=FALSE, warning=FALSE}
 #outlier
-p<-data_monthly1 %>%
+p<-data_monthly2_f %>%
   group_by(WHO_region, Face_cover, Vaccination, Internal_movement, International_travel, Stay_home) %>%
   identify_outliers(New_cases)
 datatable(p, caption = htmltools::tags$caption(
@@ -1410,7 +1457,7 @@ datatable(p, caption = htmltools::tags$caption(
 
 
 <span style='color:black'>
-The primary objective of this analysis is to identify whether public health policies have a significant impact on the number of positive Covid-19 cases using data obtained from various sources. Using the Analysis of variance (ANOVA) method to assess the effect of public health policies on Covid-19 cases across different regions, we can conclude that all the public health policies have significant association with the number of positive cases in different regions around the world. To answer the secondary question of interest stated in the introduction section, face covering and vaccination policies have the highest effect size out of all the 6 factors included in the model while stay-at-home order has the least effect size. It important to clarify that these identified association between the number of positive Covid-19 cases and the significant factors may be a classified as an indirect association due to the fact that successful transmission of the Covid-19 virus may depend on other factors that are excluded from this analysis that can be used to define the significant relationships observed. Further investigations maybe necessary in order to verify the results obtained from the methods used in this analysis. The relationships between the variables in the data used for this project can be explored using other methods such as Mixed Effect ANOVA with multiple factors using Country as the random factor and holding the policy factors fixed. The results of using Fixed-effect ANOVA suggests that all public health policies and their interactions have significant effect on the number of positive Covid-19 cases across different regions worldwide. This may be the reason why the current number of positive cases is generally declining however, there were times during the pandemic when these factors were not effective due the increase in positive cases recorded. Therefore, we should not only consider these factors when determining the possible causes of increased virus transmission if if they are extremely helpful. The presence of other factor might play an important role and override the effects of the public health policies. Overall, government interventions are necessary during a pandemic as we see in these results. 
+The primary objective of this analysis is to identify whether public health policies have a significant impact on the number of positive Covid-19 cases using data obtained from various sources. Using the Analysis of variance (ANOVA) method to assess the effect of public health policies on Covid-19 cases across different regions, we can conclude that all the public health policies have significant association with the number of positive Covid-19 cases in different regions around the world. To answer the secondary question of interest stated in the introduction section, face covering and vaccination policies have the highest effect size out of all the 5 policies included in the model while stay-at-home order has the least effect size. It is important to clarify that the identified association between the number of positive Covid-19 cases and the significant factors may be a classified as an indirect association due to the fact that successful transmission of the Covid-19 virus may depend on other factors that are excluded from this analysis that can be used to define the significant relationships observed. Further investigations maybe necessary in order to verify the results obtained from the methods used in this analysis. The relationships between the variables in the data used for this project can be explored using other methods such as Mixed Effect ANOVA with multiple factors using Country as the random factor and holding the policy factors fixed. The results of using Fixed-effect ANOVA suggests that all public health policies and their interactions have significant effect on the number of positive Covid-19 cases across different regions worldwide. This may be the reason why the current number of positive cases is generally declining. However, it is important to note that there are periods during the pandemic when these factors can be considered ineffective due the increase in positive cases recorded. Although the government policies are highly useful in identifying potential causes of increased virus transmission, it is important to not solely rely on them. Other factors may also have a significant impact and could override the effects of public health policies. Therefore, it is crucial to take a comprehensive approach in identifying and addressing factors that contribute to the spread of the virus. Overall, the results of this analysis suggest that government interventions are necessary during a pandemic.
 </span>
 
 
